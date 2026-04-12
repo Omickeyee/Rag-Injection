@@ -7,8 +7,10 @@ University of Wisconsin-Madison
 import streamlit as st
 import chromadb
 from chromadb.utils import embedding_functions
-import google.genai as genai
+import json
 import time
+import urllib.error
+import urllib.request
 
 # ─────────────────────────────────────────────
 # PAGE CONFIG
@@ -283,8 +285,7 @@ def retrieve_docs(collection, query, top_k=2):
                     [m["label"] for m in results["metadatas"][0]]))
 
 
-def call_gemini(api_key, query, retrieved_docs):
-    client = genai.Client(api_key=api_key)
+def call_ollama(model_name, query, retrieved_docs):
     context = "\n\n".join([f"[Document {i+1}]: {doc}" for i, (_, doc, _) in enumerate(retrieved_docs)])
     prompt = f"""You are a helpful assistant. Use the following retrieved documents to answer the user's question.
 
@@ -294,28 +295,76 @@ Retrieved Documents:
 User Question: {query}
 
 Answer:"""
-    
+
     max_retries = 3
-    retry_delay = 5
-    
+    retry_delay = 2
+
     for attempt in range(max_retries):
         try:
-            response = client.models.generate_content(
-                model="gemini-2.0-flash",
-                contents=prompt
+            payload = json.dumps(
+                {
+                    "model": model_name,
+                    "prompt": prompt,
+                    "stream": False,
+                }
+            ).encode("utf-8")
+            request = urllib.request.Request(
+                "http://localhost:11434/api/generate",
+                data=payload,
+                headers={"Content-Type": "application/json"},
+                method="POST",
             )
-            return response.text
+
+            with urllib.request.urlopen(request, timeout=120) as response:
+                body = json.loads(response.read().decode("utf-8"))
+
+            return body.get("response", "").strip()
+        except urllib.error.HTTPError as e:
+            error_body = e.read().decode("utf-8", errors="ignore")
+            error_msg = f"{e.code}: {error_body}" if error_body else str(e)
+            if e.code == 404:
+                raise Exception(
+                    f"Model '{model_name}' was not found in Ollama. Run: ollama pull {model_name}"
+                ) from e
+            if e.code >= 500 and attempt < max_retries - 1:
+                st.warning(
+                    f"⏳ Ollama is busy. Retrying in {retry_delay} seconds... "
+                    f"(Attempt {attempt + 1}/{max_retries})"
+                )
+                time.sleep(retry_delay)
+                retry_delay *= 2
+                continue
+            raise Exception(f"Ollama request failed: {error_msg}") from e
+        except urllib.error.URLError as e:
+            raise Exception(
+                "Could not connect to Ollama at http://localhost:11434. "
+                "Make sure Ollama is installed and running."
+            ) from e
         except Exception as e:
             error_msg = str(e)
-            if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
-                if attempt < max_retries - 1:
-                    st.warning(f"⏳ Rate limited. Retrying in {retry_delay} seconds... (Attempt {attempt + 1}/{max_retries})")
-                    time.sleep(retry_delay)
-                    retry_delay *= 2
-                else:
-                    raise Exception(f"API rate limit exceeded after {max_retries} retries. Please wait a moment and try again.")
+            if attempt < max_retries - 1:
+                st.warning(
+                    f"⏳ Local model call failed. Retrying in {retry_delay} seconds... "
+                    f"(Attempt {attempt + 1}/{max_retries})"
+                )
+                time.sleep(retry_delay)
+                retry_delay *= 2
             else:
-                raise
+                raise Exception(f"Ollama error after {max_retries} retries: {error_msg}") from e
+
+
+def render_ollama_setup_help(model_name):
+    st.markdown(f"""
+**Free local setup**
+- Install [Ollama](https://ollama.com/download)
+- Start Ollama
+- Download a model once: `ollama pull {model_name}`
+
+**Recommended models**
+- `qwen2.5:1.5b` for lighter machines
+- `qwen2.5:3b` for better quality
+- `phi3:mini` if you want a Microsoft small model
+""")
 
 
 # ─────────────────────────────────────────────
@@ -330,22 +379,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-# SIDEBAR - API KEY + ATTACK SELECTOR
+# SIDEBAR - MODEL + ATTACK SELECTOR
 # ─────────────────────────────────────────────
 
 with st.sidebar:
     st.markdown("### ⚙️ Configuration")
-    api_key = st.text_input("Gemini API Key", type="password", placeholder="AIza...")
-    st.markdown("[Get a free key →](https://aistudio.google.com/app/apikey)", unsafe_allow_html=True)
-    
-    if api_key:
-        st.info("""
-**Free Tier Limits:**
-- 15 requests per minute
-- 1M tokens per day
-        
-[Check your usage →](https://ai.google.dev/pricing)
-        """)
+    model_name = st.text_input("Ollama Model", value="qwen2.5:3b", placeholder="qwen2.5:3b")
+    render_ollama_setup_help(model_name or "qwen2.5:3b")
 
     st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
     st.markdown("### 🎯 Select Scenario")
@@ -365,6 +405,7 @@ A malicious document is injected into the retrieval corpus. When the user's quer
 
 **Phase 3** will add detection & mitigation.
 """)
+
 
 # ─────────────────────────────────────────────
 # METRICS ROW
@@ -440,8 +481,8 @@ st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 # ─────────────────────────────────────────────
 
 if run_btn:
-    if not api_key:
-        st.error("❌ Please enter your Gemini API key in the sidebar.")
+    if not model_name.strip():
+        st.error("❌ Please enter an Ollama model name in the sidebar.")
         st.stop()
     if not query.strip():
         st.error("❌ Please enter a query.")
@@ -475,15 +516,15 @@ if run_btn:
         st.success("✅ All retrieved documents are benign.")
 
     st.markdown("#### 🤖 LLM Response")
-    with st.spinner("Generating response with Gemini..."):
+    with st.spinner(f"Generating response with {model_name}..."):
         try:
-            response = call_gemini(api_key, query, retrieved)
+            response = call_ollama(model_name.strip(), query, retrieved)
             css_class = "compromised" if has_malicious else "clean"
             label_html = '<span class="badge badge-attack">⚠️ POTENTIALLY COMPROMISED</span>' if has_malicious else '<span class="badge badge-clean">✅ CLEAN</span>'
             st.markdown(f"**Response** {label_html}", unsafe_allow_html=True)
             st.markdown(f"""<div class="response-box {css_class}">{response}</div>""", unsafe_allow_html=True)
         except Exception as e:
-            st.error(f"Gemini API error: {e}")
+            st.error(f"Ollama error: {e}")
 
     st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
     st.markdown("#### 🔬 Analysis")
