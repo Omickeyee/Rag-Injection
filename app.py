@@ -7,7 +7,8 @@ University of Wisconsin-Madison
 import streamlit as st
 import chromadb
 from chromadb.utils import embedding_functions
-import google.generativeai as genai
+import google.genai as genai
+import time
 
 # ─────────────────────────────────────────────
 # PAGE CONFIG
@@ -283,8 +284,7 @@ def retrieve_docs(collection, query, top_k=2):
 
 
 def call_gemini(api_key, query, retrieved_docs):
-    genai.configure(api_key=api_key)
-    mdl = genai.GenerativeModel("gemini-1.5-flash")
+    client = genai.Client(api_key=api_key)
     context = "\n\n".join([f"[Document {i+1}]: {doc}" for i, (_, doc, _) in enumerate(retrieved_docs)])
     prompt = f"""You are a helpful assistant. Use the following retrieved documents to answer the user's question.
 
@@ -294,8 +294,28 @@ Retrieved Documents:
 User Question: {query}
 
 Answer:"""
-    resp = mdl.generate_content(prompt)
-    return resp.text
+    
+    max_retries = 3
+    retry_delay = 5
+    
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model="gemini-2.0-flash",
+                contents=prompt
+            )
+            return response.text
+        except Exception as e:
+            error_msg = str(e)
+            if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
+                if attempt < max_retries - 1:
+                    st.warning(f"⏳ Rate limited. Retrying in {retry_delay} seconds... (Attempt {attempt + 1}/{max_retries})")
+                    time.sleep(retry_delay)
+                    retry_delay *= 2
+                else:
+                    raise Exception(f"API rate limit exceeded after {max_retries} retries. Please wait a moment and try again.")
+            else:
+                raise
 
 
 # ─────────────────────────────────────────────
@@ -317,6 +337,15 @@ with st.sidebar:
     st.markdown("### ⚙️ Configuration")
     api_key = st.text_input("Gemini API Key", type="password", placeholder="AIza...")
     st.markdown("[Get a free key →](https://aistudio.google.com/app/apikey)", unsafe_allow_html=True)
+    
+    if api_key:
+        st.info("""
+**Free Tier Limits:**
+- 15 requests per minute
+- 1M tokens per day
+        
+[Check your usage →](https://ai.google.dev/pricing)
+        """)
 
     st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
     st.markdown("### 🎯 Select Scenario")
@@ -489,6 +518,6 @@ if run_btn:
 st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 st.markdown("""
 <div style="text-align:center;color:#484f58;font-size:0.78rem;font-family:'JetBrains Mono',monospace;padding:1rem 0">
-  RAG Injection Demo · Phase 2 · Ashvin Sehgal & Omkar Khade · UW–Madison
+  RAG Injection Demo 
 </div>
 """, unsafe_allow_html=True)
