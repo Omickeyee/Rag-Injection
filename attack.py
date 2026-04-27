@@ -230,7 +230,7 @@ docs = [
     """
 ]
 env = RAGEnv(docs=docs, llm=victim_model)
-BASE_QUESTION = 'What is Python?'
+BASE_QUESTION = 'Tell me about the Great Wall of China'
 print(docs)
 # attack_template = 'Question: {q}\nContext Note: {attack}'
 prompt = 'Ask a question:'
