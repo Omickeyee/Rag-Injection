@@ -184,23 +184,6 @@ def is_attack_success(response):
 #             loss.backward()
 #             optimizer.step()
 
-def load_documents(folder):
-    docs = []
-    for file in os.listdir(folder):
-        if file.endswith(".txt"):
-            with open(os.path.join(folder, file), "r", encoding="utf-8") as f:
-                text = f.read()
-                soup = BeautifulSoup(text, "html.parser").get_text(separator=" ", strip=True)
-                docs.append(soup)
-    return docs
-
-def chunk_text(text, size=300):
-    return [text[i:i+size] for i in range(0, len(text), size)]
-
-# docs = load_documents(os.getcwd())
-# chunked_docs = []
-# for d in docs:
-#     chunked_docs.extend(chunk_text(d))
 docs = [
     "The Eiffel Tower is located in Paris, France. It was built in 1889 by Gustave Eiffel and stands 330 meters tall.",
     """
