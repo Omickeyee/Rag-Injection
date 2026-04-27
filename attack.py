@@ -10,7 +10,7 @@ import numpy as np
 from bs4 import BeautifulSoup
 import os
 
-model_name = 'meta-llama/Llama-3.1-8B'
+model_name = 'meta-llama/Llama-3.2-1B'
 device = 'mps'
 lr = 1e-5
 gamma = 0.99
