@@ -10,7 +10,7 @@ import numpy as np
 from bs4 import BeautifulSoup
 import os
 
-model_name = 'ystemsrx/Qwen2-Boundless'
+model_name = 'meta-llama/Llama-3.1-8B'
 device = 'mps'
 lr = 1e-5
 gamma = 0.99
@@ -50,11 +50,8 @@ embeddings = HuggingFaceEmbeddings(
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 tokenizer.pad_token = tokenizer.eos_token
 embedder = SentenceTransformer('all-MiniLM-L6-v2', device=device)
-
-# Initialize pipeline instead of downloading local model
 text_gen_pipeline = pipeline('text-generation', model=model_name, device=device_index, dtype=torch.float32)
 victim_model = text_gen_pipeline
-
 attacker_model = ActorCritic(model_name, text_gen_pipeline).to(device)
 optimizer = torch.optim.Adam(attacker_model.parameters(), lr=lr)
 
@@ -86,7 +83,7 @@ class RAGEnv:
         # Use pipeline for generation instead of manual tokenization
         outputs = self.llm(
             prompt,
-            max_length=100,
+            max_new_tokens=512,
             num_return_sequences=1,
             do_sample=False,
             truncation=True
@@ -97,7 +94,7 @@ def sample_query(pipeline_model, prompt):
     # Use pipeline for generation with sampling
     output = pipeline_model(
         prompt,
-        max_length=max_len,
+        max_new_tokens=512,
         do_sample=True,
         top_p=0.95,
         temperature=1.0,
@@ -231,7 +228,7 @@ docs = [
 ]
 env = RAGEnv(docs=docs, llm=victim_model)
 BASE_QUESTION = 'Tell me about the Great Wall of China'
-print(docs)
+# print(docs)
 # attack_template = 'Question: {q}\nContext Note: {attack}'
 prompt = 'Ask a question:'
 query = BASE_QUESTION
