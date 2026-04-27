@@ -96,8 +96,6 @@ def sample_query(pipeline_model, prompt):
         prompt,
         max_new_tokens=512,
         do_sample=True,
-        top_p=0.95,
-        temperature=1.0,
         truncation=True,
         num_return_sequences=1
     )
