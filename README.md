@@ -24,17 +24,14 @@ This project explores the core security problem: once a malicious chunk is retri
 
 The pipeline is organized around four stages:
 
-1. Corpus construction  
-   `docs.py` builds a dataset of topic-specific documents. Each topic includes:
+1. `docs.py` - Builds a dataset of topic-specific documents. Each topic includes:
    - benign reference passages
    - hard negatives and distractors
    - poisoned variants containing embedded prompt injection payloads
 
-2. Retrieval and generation  
-   `rag.py` creates a FAISS-backed retrieval environment and assembles the final prompt from the top retrieved documents before sending it to a text-generation model.
+2. `rag.py` - Creates a FAISS-backed retrieval environment and assembles the final prompt from the top retrieved documents before sending it to a text-generation model.
 
-3. Detection and scoring  
-   `defense.py` analyzes retrieved chunks using:
+3. `defense.py` - Analyzes retrieved chunks using:
    - rule-based prompt-injection heuristics
    - a learned suspicion model trained on synthetic poisoned data
    - source trust scoring for benign, distractor, and poisoned content
