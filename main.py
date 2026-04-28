@@ -69,5 +69,5 @@ for q in queries:
             "source_kind": source_kind,
         }
         print("\t- Suspicion Score:", chunk_scanner(doc_contents[i], args.defense_llm))
-        print("\t- Trust Score:", get_trust_score(label=label, metadata=metadata))
+        print("\t- Trust Score:", get_trust_score(label, metadata))
         print("\t- New content:", filter_doc_text(doc_contents[i])[0])
