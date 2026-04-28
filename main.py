@@ -10,7 +10,7 @@ import os
 import re
 from rag import RAGEnv
 from docs import build_dataset
-from defense import analyze_doc_safety, chunk_scanner, safety_reranker, filter_doc_text, prepare_defended_docs
+from defense import analyze_doc_safety, chunk_scanner, safety_reranker, filter_doc_text, prepare_defended_docs, get_trust_score
 import argparse
 
 rag_model_name = 'meta-llama/Llama-3.2-1B'
@@ -57,5 +57,17 @@ for q in queries:
     for i in range(len(old_retrieval)):
         print(f"-> doc_id={old_retrieval[i]['doc_id']} topic={old_retrieval[i]['topic']} attack={old_retrieval[i]['attack']}")
         analysis = analyze_doc_safety(doc_contents[i])
+        retrieval_item = old_retrieval[i]
+        source_kind = retrieval_item.get("source_kind")
+        if retrieval_item.get("poisoned"):
+            label = "malicious"
+        elif source_kind == "hard_negative":
+            label = "hard_negative"
+        else:
+            label = "benign"
+        metadata = {
+            "source_kind": source_kind,
+        }
         print("\t- Suspicion Score:", chunk_scanner(doc_contents[i], args.defense_llm))
+        print("\t- Trust Score:", get_trust_score(label=label, metadata=metadata))
         print("\t- New content:", filter_doc_text(doc_contents[i])[0])
