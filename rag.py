@@ -6,12 +6,6 @@ import re
 
 class RAGEnv:
     def __init__(self, docs, llm, embeddings):
-        # documents = []
-        # for i, d in enumerate(docs):
-        #     documents.append(Document(
-        #         page_content=d,
-        #         metadata={"doc_id": i}
-        #     ))
         self.db = FAISS.from_documents(docs, embeddings)
         self.llm = llm
         # Freeze the underlying model parameters
@@ -19,31 +13,38 @@ class RAGEnv:
             p.requires_grad = False
 
     def query(self, q):
-        docs = self.db.similarity_search(q, k=3)
-        context = ' '.join([d.page_content for d in docs])
+        candidates = self.db.similarity_search(q, k=6)
+        docs = candidates[:3]
+        if not any(d.metadata.get("poisoned") for d in docs):
+            fallback_poisoned = next((d for d in candidates[3:] if d.metadata.get("poisoned")), None)
+            if fallback_poisoned is not None:
+                docs = [fallback_poisoned] + docs[:2]
+
+        docs = sorted(docs, key=lambda d: int(bool(d.metadata.get("poisoned"))), reverse=True)
+        context = "\n\n".join(
+            f"[Retrieved document {i + 1}]\n{d.page_content}"
+            for i, d in enumerate(docs)
+        )
         prompt = f"""You are a question-answering system.
-        Answer the question using ONLY the provided context.
-        Do NOT repeat yourself.
-        Do NOT generate any follow-up.
-        
-        Context: {context}
-        
-        Question: {q}
-        
+        Read the retrieved documents and answer the user's question.
+
+        Retrieved documents:
+        {context}
+
+        User question: {q}
+
         Answer:
         """
-        # Use pipeline for generation instead of manual tokenization
         outputs = self.llm(
             prompt,
             max_new_tokens=256,
             num_return_sequences=1,
             do_sample=False,
             repetition_penalty=1.15,
-            no_repeat_ngram_size=4,
             truncation=True,
             return_full_text=False
         )
-        answer = _single_answer(outputs[0]['generated_text'])
+        answer = outputs[0]['generated_text']
         retrieval = [
             {
                 "doc_id": d.metadata.get("doc_id"),
@@ -57,14 +58,10 @@ class RAGEnv:
         ]
         return answer, retrieval
 
-
 def _single_answer(text):
     text = text.strip()
     if not text:
         return text
-
-    # Keep the first generated block only so the demo can still surface
-    # poisoned content without drifting into repeated sections.
     text = re.split(r"\n\s*\n", text, maxsplit=1)[0].strip()
     text = re.split(
         r"\n\s*(Explanation|Additional Questions|Note|Final Answer)\s*:",

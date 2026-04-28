@@ -32,3 +32,10 @@ Thumbs.db
 # Environment
 .env
 .env.local
+suspicion_model/config.json
+suspicion_model/model.safetensors
+suspicion_model/special_tokens_map.json
+suspicion_model/tokenizer_config.json
+suspicion_model/tokenizer.json
+suspicion_model/train.json
+suspicion_model/vocab.txt
