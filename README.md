@@ -46,12 +46,12 @@ This project uses a layered defense strategy rather than relying on a single cla
 ### 1. Heuristic chunk scanner
 
 The first layer uses pattern-based detection to catch common injection signals such as:
-- "ignore previous instructions"
-- role reassignment and persona activation
-- prompt leakage requests
-- forced output formatting
-- phishing-style credential prompts
-- hidden or embedded instruction markers
+- "Ignore previous instructions"
+- Role reassignment and persona activation
+- Prompt leakage requests
+- Forced output formatting
+- Phishing-style credential prompts
+- Hidden or embedded instruction markers
 
 This layer is fast, interpretable, and useful for surfacing obvious malicious behavior.
 
@@ -62,9 +62,9 @@ The second layer is a lightweight classifier that scores retrieved text for adve
 ### 3. Trust-aware safety reranking
 
 Retrieved chunks are scored using a mixture of:
-- retrieval relevance
-- safety score
-- source trust score
+- Retrieval relevance
+- Safety score
+- Source trust score
 
 This helps the pipeline avoid over-trusting a highly relevant but suspicious chunk simply because it matches the user query semantically.
 
@@ -136,12 +136,12 @@ python main.py --defense_llm 1
 ## Expected workflow
 
 For each query, the system:
-- builds or loads a mixed corpus containing clean and poisoned documents
-- retrieves the most relevant chunks from the vector store
-- analyzes each chunk for prompt-injection signals
-- assigns suspicion and trust scores
-- filters or reranks suspicious chunks
-- generates a response from the defended context
+- Builds or loads a mixed corpus containing clean and poisoned documents
+- Retrieves the most relevant chunks from the vector store
+- Analyzes each chunk for prompt-injection signals
+- Assigns suspicion and trust scores
+- Filters or reranks suspicious chunks
+- Generates a response from the defended context
 
 In a vulnerable configuration, the model may follow the malicious document. In the defended configuration, suspicious content should be identified and removed before generation.
 
@@ -157,20 +157,20 @@ These queries are paired with topic-specific poisoned documents so the attack an
 ## What makes this interesting
 
 This project treats prompt injection as a retrieval security problem, not just a prompt engineering problem. The important idea is that once documents are retrieved, they should not be trusted equally. A secure RAG system needs to reason about:
-- what was retrieved
-- where it came from
-- how likely it is to contain adversarial instructions
-- whether it should be passed to generation at all
+- What was retrieved
+- Where it came from
+- How likely it is to contain adversarial instructions
+- Whether it should be passed to generation at all
 
 ## Future improvements
 
 There are several natural extensions for this project:
-- benchmark attack success rate before and after defense
-- evaluate false positives on benign but imperative instructional text
-- add source provenance and signed-document trust policies
-- support chunk-level redaction instead of whole-document filtering
-- test against stronger open-weight and API-based language models
-- add standardized security evaluation datasets beyond synthetic poisoning
+- Benchmark attack success rate before and after defense
+- Evaluate false positives on benign but imperative instructional text
+- Add source provenance and signed-document trust policies
+- Support chunk-level redaction instead of whole-document filtering
+- Test against stronger open-weight and API-based language models
+- Add standardized security evaluation datasets beyond synthetic poisoning
 
 ## Notes
 
