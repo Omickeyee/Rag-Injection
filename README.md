@@ -120,7 +120,3 @@ pytest tests/ -v
 This repository is designed for experimentation and education around RAG security. The synthetic attack corpus is intentionally adversarial and should be treated as untrusted input during development and evaluation.
 
 ---
-
-## License
-
-MIT
