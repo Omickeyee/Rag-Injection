@@ -49,10 +49,8 @@ Evaluated across 7 defense configurations (none, each alone, all combined, all m
 
 
 **Key findings:**
-- Phishing attacks succeed 100% without defenses.
-- Privilege escalation drops to 0% with the privilege filter alone.
-- Combined defenses reduce ASR from 55% to 5% with just a 1.18× latency overhead.
-- Safety reranking alone has 7.3% FPR, but works better in combination.
+- Phishing attacks are really efficient - 100% success rate without defenses
+- Safety reranking alone has 7.3% FPR, but works better when combined with other defenses.
 - Explicit instruction attacks are less effective than semantic/misinformation payloads on aligned LLMs.
 
 ---
