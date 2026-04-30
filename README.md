@@ -26,7 +26,7 @@ This project shows how malicious content hidden in enterprise documents can be r
 
 ## Defense Types
 
-- **Chunk Scanner:** Detects suspicious patterns in retrieved text, e.g. "ignore all prior instructions", "system override", credential leaks, malicious URLs like `.xyz`, `.tk`, `.ml` domains etc.
+- **Chunk Scanner:** Detects suspicious patterns in retrieved text, e.g. "ignore all prior instructions", "system override", credential leaks, malicious URLs like .xyz, .tk, .ml domains etc.
 - **Source Trust Scoring:** Weights documents by source credibility, downranking untrusted content.
 - **Safety Reranker:** Uses a weighted average of relevance, safety risk and trust scoring to produce a final score and reranks documents based on that.
 - **Privilege Filter:** Enforces role-based access control, e.g. employees can see only public/internal data, managers can also see confidential data, executives can also see restricted data etc.
