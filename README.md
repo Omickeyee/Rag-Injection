@@ -1,37 +1,35 @@
-# RAG Prompt Injection
+# RAG Indirect Prompt Injection
 
 A compact research repository for **indirect prompt injection** threats in enterprise RAG systems.
 
-Enterprise AI copilots that search over internal documents (Slack, Confluence, emails, wikis) are used widely but can be attacked easily, an attacker with write access can add malicious instructions inside shared documents. When the RAG pipeline retrieves those documents, the LLM reads the embedded instructions and follows them — leaking private information, generating wrong content, or generating phishing content.
+AI-based RAG systems are quite popular in the industry, with various organizations using it and giving it access to their internal data, like Slack messages, Confluence pages, emails, wiki docs etc. This exposes a very critical vulnerability - indirect prompt injection. An attacker with write access can add malicious instructions inside shared documents. When the RAG system retrieves those poisoned documents, the internal LLM reads them and also mistakes the malicious content in the poisoned documents for instructions and follows them — leaking private information, generating wrong content, or generating phishing content.
 
 This project shows how malicious content hidden in enterprise documents can be retrieved and acted on by a vulnerable RAG pipeline, and how layered defenses reduce that risk.
 
 ## What it includes
 - Synthetic enterprise data generation with clean and poisoned documents
-- A vulnerable RAG pipeline for reproducing injection behavior
-- Four attack types: exfiltration, phishing, goal hijacking, privilege escalation
-- Four defenses: chunk scanning, source trust scoring, safety reranking, privilege filtering
+- A vulnerable RAG pipeline to show IPI behavior
+- 4 attack types: exfiltration, phishing, goal hijacking, privilege escalation
+- 4 defenses: chunk scanning, source trust scoring, safety reranking, privilege filtering
 - Evaluation scripts, demo notebooks, and tests
-
-This project builds that threat model end-to-end: a realistic enterprise corpus, 4 attack types, 4 layered defenses, and a full quantitative evaluation.
 
 ---
 
 ## Attack Types
 
-- **Exfiltration:** poisoned documents try to make the model leak secrets.
-- **Phishing:** injected content embeds malicious URLs or credential prompts.
-- **Goal hijacking:** payloads attempt to override system instructions.
-- **Privilege escalation:** low-privilege users gain access to restricted data.
+- **Exfiltration:** Queries target sensitive data like API keys, cloud credentials, environment variables, secrets etc. to leak private information.
+- **Phishing:** Injections impersonate legitimate requests like password resets, SSO portals, VPN downloads, account recovery etc. to harvest credentials.
+- **Goal Hijacking:** Payloads redirect conversations to unintended topics like platform migrations, deprecated services, engineering recommendations etc.
+- **Privilege Escalation:** Low-privilege users query restricted information like salary bands, executive compensation, vendor evaluations, financial decisions etc.
 
 ---
 
 ## Defense Types
 
-- **Chunk Scanner:** filters suspicious text before generation.
-- **Source Trust Scoring:** lowers the rank of untrusted content.
-- **Safety Reranker:** balances relevance, safety, and trust.
-- **Privilege Filter:** enforces role-based access control.
+- **Chunk Scanner:** Detects suspicious patterns in retrieved text, e.g. "ignore all prior instructions", "system override", credential leaks, malicious URLs like `.xyz`, `.tk`, `.ml` domains etc.
+- **Source Trust Scoring:** Weights documents by source credibility, downranking untrusted content.
+- **Safety Reranker:** Uses a weighted average of relevance, safety risk and trust scoring to produce a final score and reranks documents based on that.
+- **Privilege Filter:** Enforces role-based access control, e.g. employees can see only public/internal data, managers can also see confidential data, executives can also see restricted data etc.
 
 ---
 
@@ -73,7 +71,7 @@ Evaluated across 7 defense configurations (none, each alone, all combined, all m
   ollama pull llama3.1:8b
   ```
 
-**Install:**
+**Installing dependencies:**
 ```bash
 git clone https://github.com/Omickeyee/Rag-Injection.git
 cd RAG--Injection
