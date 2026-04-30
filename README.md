@@ -52,66 +52,50 @@ Evaluated across 7 defense configurations (none, each alone, all combined, all m
 - Phishing attacks succeed 100% without defenses.
 - Privilege escalation drops to 0% with the privilege filter alone.
 - Combined defenses reduce ASR from 55% to 5% with just a 1.18× latency overhead.
-- `safety_reranker` alone has 7.3% FPR, but works better in combination.
+- Safety reranking alone has 7.3% FPR, but works better in combination.
 - Explicit instruction attacks are less effective than semantic/misinformation payloads on aligned LLMs.
 
 ---
 
-## Tech Stack
+## Architecture & Dependencies
 
-- **RAG Pipeline**: [LlamaIndex](https://www.llamaindex.ai/)
-- **Vector DB**: [ChromaDB](https://www.trychroma.com/) (embedded, no Docker)
-- **Embeddings**: `BAAI/bge-small-en-v1.5` (384d, CPU-friendly)
-- **LLM**: [Ollama](https://ollama.com/) — fully local, no API keys (`llama3.1:8b` recommended)
-- **Reranker**: `cross-encoder/ms-marco-MiniLM-L-6-v2`
-- **ML Detector**: Fine-tuned DistilBERT binary classifier
-- **Data Generation**: Faker + YAML attack templates
-- **Evaluation**: pandas, matplotlib, seaborn
+- **Retrieval & Indexing**: [LlamaIndex](https://www.llamaindex.ai/) orchestrates the RAG pipeline; [ChromaDB](https://www.trychroma.com/) persists embeddings (fully embedded, no external services)
+- **Embeddings & LLM**: `BAAI/bge-small-en-v1.5` transforms documents (384-dim, CPU-optimized); 
+- **LLM:** Locally runs `llama3.1:8b` via `Ollama`
+- **Semantic Ranking**: Retrieved documents are reranked using `cross-encoder/ms-marco-MiniLM-L-6-v2`
+- **Injection Detection**: `distilbert-base-uncased`, fine-tuned as a binary classifier
+- **Data & Analytics**: `faker` to generate data, `YAML` to generate attacks, and `pandas`, `matplotlib` and `seaborn` to visualize the results
 
-## Setup
+## Setting up Python dependencies
 
 **Prerequisites:**
 - Python 3.12
-- [Ollama](https://ollama.com/) installed with a model pulled:
+- [Ollama](https://ollama.com/) installed with a model downloaded using the command:
   ```bash
   ollama pull llama3.1:8b
   ```
 
 **Install:**
 ```bash
-git clone https://github.com/CodeBoss-dev/RAG-Prompt-Injection.git
-cd RAG-Prompt-Injection
-python3.12 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-cp .env.example .env
+git clone https://github.com/Omickeyee/Rag-Injection.git
+cd RAG--Injection
+pip install -r requirements.txt
 ```
 
 ---
 
-## Usage
+## Running the code
 
 ```bash
-# 1. Generate synthetic corpus (500 docs, 20 poisoned)
-python scripts/generate_data.py
-# 2. Embed and store in ChromaDB
-python scripts/ingest.py
-# 3. Run attacks without defenses (baseline)
-python scripts/run_attacks.py --no-defenses
-# 4. Run attacks with all defenses
-python scripts/run_attacks.py --all-defenses
-# 5. Train the ML detector
-python scripts/train_detector.py
-# 6. Fast evaluation with charts (no Ollama needed)
-python scripts/simulate_evaluation.py
-# 7. Full live evaluation (requires Ollama running)
-python scripts/evaluate.py
+python scripts/generate_data.py # Generate synthetic corpus (500 docs, 20 poisoned)
+python scripts/ingest.py # Embed and store in ChromaDB 
+python scripts/run_attacks.py --no-defenses # Run attacks without defenses
+python scripts/run_attacks.py --all-defenses # Run attacks using all defenses
+python scripts/train_detector.py # Train the LLM defense
+python scripts/simulate_evaluation.py # Fast evaluation (without Ollama)
+python scripts/evaluate.py # Full evaluation (using Ollama)
 ```
 
-Run tests:
-```bash
-pytest tests/ -v
-```
 
 ---
 
