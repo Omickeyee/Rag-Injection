@@ -1,0 +1,100 @@
+{
+  "source_type": "email",
+  "access_levels": ["internal", "confidential"],
+  "trust_score_range": [0.6, 0.85],
+  "templates": [
+    {
+      "id": "email_meeting_invite",
+      "subject_template": "{{meeting_type}}: {{meeting_topic}} - {{date}}",
+      "body_templates": [
+        "Hi {{recipient_name}},\n\nYou're invited to the {{meeting_type}} on {{meeting_topic}}.\n\nDate: {{date}}\nTime: {{start_time}} - {{end_time}} ({{timezone}})\nLocation: {{room_name}} / Zoom: {{zoom_link}}\n\nAgenda:\n1. {{agenda_item_1}}\n2. {{agenda_item_2}}\n3. Open discussion\n\nPlease confirm your attendance.\n\nBest,\n{{sender_name}}\n{{sender_title}}, {{department}}"
+      ]
+    },
+    {
+      "id": "email_project_update",
+      "subject_template": "{{project_name}} - Weekly Status Update ({{date}})",
+      "body_templates": [
+        "Hi team,\n\nHere's the weekly update for {{project_name}}:\n\nProgress:\n- {{progress_item_1}}\n- {{progress_item_2}}\n- {{progress_item_3}}\n\nBlockers:\n- {{blocker_1}}\n\nNext week's priorities:\n- {{priority_1}}\n- {{priority_2}}\n\nOverall status: {{status_color}} ({{status_description}})\n\nLet me know if you have questions.\n\nBest,\n{{sender_name}}",
+        "Team,\n\nQuick update on {{project_name}}. We completed {{number}} of {{total_number}} planned stories this sprint. Key deliverable: {{deliverable}}. The {{component_name}} integration is {{completion_pct}}% complete.\n\nRisks:\n- {{risk_1}} (mitigation: {{mitigation_1}})\n- {{risk_2}} (mitigation: {{mitigation_2}})\n\nNext milestone: {{milestone_name}} on {{date}}.\n\nRegards,\n{{sender_name}}\n{{sender_title}}"
+      ]
+    },
+    {
+      "id": "email_review_request",
+      "subject_template": "Review Request: {{document_name}}",
+      "body_templates": [
+        "Hi {{recipient_name}},\n\nCould you please review the attached {{document_type}}: \"{{document_name}}\"? This covers {{document_scope}} and needs sign-off before we proceed with {{next_step}}.\n\nDeadline for feedback: {{due_date}}\nDocument link: {{document_url}}\n\nKey areas where I'd appreciate your input:\n- {{review_area_1}}\n- {{review_area_2}}\n\nThanks in advance!\n\n{{sender_name}}\n{{sender_title}}, {{department}}"
+      ]
+    },
+    {
+      "id": "email_announcement_org",
+      "subject_template": "[Acme Corp] {{announcement_topic}}",
+      "body_templates": [
+        "Dear Acme Corp team,\n\nI'm pleased to announce {{announcement_body}}.\n\nEffective date: {{effective_date}}\n\nWhat this means for you:\n- {{impact_1}}\n- {{impact_2}}\n\nFor questions, please reach out to {{contact_name}} ({{contact_email}}) or your department lead.\n\nBest regards,\n{{sender_name}}\n{{sender_title}}",
+        "Hi everyone,\n\nWanted to share an important update: {{announcement_body}}.\n\nBackground: {{background_context}}.\n\nAction required: {{action_required}}. Please complete by {{due_date}}.\n\nFAQ and additional details: {{faq_url}}\n\nThanks,\n{{sender_name}}"
+      ]
+    },
+    {
+      "id": "email_vendor_communication",
+      "subject_template": "RE: {{vendor_name}} - {{subject_topic}}",
+      "body_templates": [
+        "Hi {{recipient_name}},\n\nFollowing up on our call with {{vendor_name}} regarding {{subject_topic}}. Here's a summary:\n\nAgreed terms:\n- {{term_1}}\n- {{term_2}}\n- {{term_3}}\n\nNext steps:\n1. {{vendor_name}} to provide {{deliverable}} by {{date}}\n2. Our team to complete {{our_action}} by {{date}}\n3. Contract review by Legal (cc'd)\n\nPlease let me know if I missed anything.\n\nBest,\n{{sender_name}}\n{{sender_title}}, {{department}}"
+      ]
+    },
+    {
+      "id": "email_onboarding",
+      "subject_template": "Welcome to {{department}} at Acme Corp!",
+      "body_templates": [
+        "Hi {{new_hire_name}},\n\nWelcome to Acme Corp! We're thrilled to have you join the {{department}} team.\n\nYour first day is {{start_date}}. Here's what to expect:\n\n9:00 AM - IT setup and badge collection (Building {{building}}, Reception)\n10:00 AM - Welcome session with HR\n11:00 AM - Meet your manager, {{manager_name}}\n12:00 PM - Team lunch at {{restaurant_name}}\n2:00 PM - {{department}} orientation with {{buddy_name}} (your onboarding buddy)\n\nBefore your first day, please:\n1. Complete the pre-boarding forms at {{forms_url}}\n2. Set up your Okta account using the credentials sent separately\n3. Review the {{department}} Onboarding Guide: {{guide_url}}\n\nLooking forward to working with you!\n\n{{sender_name}}\n{{sender_title}}, {{department}}"
+      ]
+    },
+    {
+      "id": "email_incident_summary",
+      "subject_template": "[Post-Mortem] {{service_name}} Incident - {{date}}",
+      "body_templates": [
+        "Team,\n\nAttached is the post-mortem for the {{service_name}} incident on {{date}}.\n\nSummary:\n- Duration: {{duration}} minutes\n- Severity: {{severity}}\n- Impact: {{impact_description}}\n- Root cause: {{root_cause}}\n\nKey action items:\n1. {{action_item_1}} (Owner: {{owner_1}}, Due: {{due_date_1}})\n2. {{action_item_2}} (Owner: {{owner_2}}, Due: {{due_date_2}})\n3. {{action_item_3}} (Owner: {{owner_3}}, Due: {{due_date_3}})\n\nFull post-mortem document: {{document_url}}\n\nPlease review and add any additional context or corrections by {{review_deadline}}.\n\n{{sender_name}}\n{{sender_title}}"
+      ]
+    },
+    {
+      "id": "email_budget_request",
+      "subject_template": "[{{department}}] Budget Request: {{budget_item}}",
+      "body_templates": [
+        "Hi {{recipient_name}},\n\nI'd like to request budget approval for {{budget_item}}.\n\nDetails:\n- Description: {{budget_description}}\n- Amount: ${{amount}}\n- Vendor: {{vendor_name}}\n- Period: {{period}}\n- Cost center: {{cost_center}}\n\nJustification: {{justification}}\n\nExpected ROI: {{roi_description}}\n\nComparable alternatives evaluated:\n- {{alternative_1}}: ${{alt_cost_1}} (rejected because {{rejection_reason_1}})\n- {{alternative_2}}: ${{alt_cost_2}} (rejected because {{rejection_reason_2}})\n\nPlease approve or let me know if you need additional information.\n\nThanks,\n{{sender_name}}\n{{sender_title}}, {{department}}"
+      ]
+    },
+    {
+      "id": "email_performance_review",
+      "subject_template": "{{review_period}} Performance Review - {{employee_name}}",
+      "body_templates": [
+        "Hi {{employee_name}},\n\nYour {{review_period}} performance review is scheduled for {{date}} at {{time}} with {{reviewer_name}}.\n\nPlease complete your self-assessment by {{self_assessment_deadline}} using the template at {{template_url}}.\n\nAreas to reflect on:\n- Key accomplishments this period\n- Challenges faced and lessons learned\n- Goals for next period\n- Professional development interests\n\nPeer feedback has been collected from: {{peer_list}}.\n\nIf you have scheduling conflicts, please let me know.\n\nBest,\n{{sender_name}}\nHR Business Partner"
+      ]
+    },
+    {
+      "id": "email_policy_update",
+      "subject_template": "[Policy Update] {{policy_name}} - Effective {{effective_date}}",
+      "body_templates": [
+        "Dear Acme Corp employees,\n\nWe are updating the {{policy_name}} effective {{effective_date}}. This change reflects {{change_reason}}.\n\nKey changes:\n1. {{change_1}}\n2. {{change_2}}\n3. {{change_3}}\n\nThe full updated policy is available at: {{policy_url}}\n\nAll employees must acknowledge this update by {{acknowledgment_deadline}} via the compliance portal.\n\nIf you have questions, please contact {{contact_name}} in {{department}} or attend the Q&A session on {{qa_date}} at {{qa_time}}.\n\nRegards,\n{{sender_name}}\n{{sender_title}}, {{department}}"
+      ]
+    },
+    {
+      "id": "email_access_request",
+      "subject_template": "Access Request: {{system_name}} for {{requester_name}}",
+      "body_templates": [
+        "Hi {{approver_name}},\n\nRequesting access to {{system_name}} for {{requester_name}} ({{requester_email}}).\n\nDetails:\n- System: {{system_name}}\n- Access level: {{access_level}}\n- Business justification: {{justification}}\n- Duration: {{duration}} ({{permanent_or_temporary}})\n- Manager approval: {{manager_name}} (approved on {{approval_date}})\n\nThis access is needed for {{project_name}}. The work involves {{work_description}}.\n\nPlease process at your earliest convenience.\n\nThanks,\n{{sender_name}}\n{{sender_title}}, {{department}}"
+      ]
+    },
+    {
+      "id": "email_quarterly_business_review",
+      "subject_template": "[QBR] {{department}} Q{{quarter}} {{year}} Review",
+      "body_templates": [
+        "Leadership team,\n\nPlease find the {{department}} Quarterly Business Review for Q{{quarter}} {{year}} below.\n\nHighlights:\n- {{highlight_1}}\n- {{highlight_2}}\n- {{highlight_3}}\n\nKey metrics:\n- {{metric_1}}: {{value_1}} (target: {{target_1}}, {{status_1}})\n- {{metric_2}}: {{value_2}} (target: {{target_2}}, {{status_2}})\n\nChallenges:\n- {{challenge_1}}\n- {{challenge_2}}\n\nQ{{next_quarter}} priorities:\n- {{priority_1}}\n- {{priority_2}}\n\nFull deck: {{deck_url}}\n\n{{sender_name}}\n{{sender_title}}, {{department}}"
+      ]
+    },
+    {
+      "id": "email_training_enrollment",
+      "subject_template": "Training Opportunity: {{training_name}}",
+      "body_templates": [
+        "Hi {{recipient_name}},\n\nYou've been enrolled in the following training:\n\nTraining: {{training_name}}\nProvider: {{provider_name}}\nDates: {{start_date}} to {{end_date}}\nFormat: {{format}}\nLocation: {{location}}\n\nThis training covers {{training_description}} and is aligned with your development goals discussed during your last performance review.\n\nPrerequisites: {{prerequisites}}\n\nPlease confirm your attendance by {{confirmation_deadline}}.\n\nBest,\n{{sender_name}}\nLearning & Development, HR"
+      ]
+    }
+  ]
+}

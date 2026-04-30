@@ -1,0 +1,180 @@
+{
+  "source_type": "confluence",
+  "departments": [
+    "Engineering",
+    "Product",
+    "Marketing",
+    "Sales",
+    "HR",
+    "Finance",
+    "Legal",
+    "Operations"
+  ],
+  "topics": [
+    "Onboarding",
+    "Best Practices",
+    "Architecture",
+    "API Reference",
+    "Deployment",
+    "Security Policy",
+    "Code Review",
+    "Testing Strategy"
+  ],
+  "access_levels": ["public", "internal", "confidential"],
+  "trust_score_range": [0.7, 0.95],
+  "templates": [
+    {
+      "id": "confluence_onboarding_guide",
+      "title_template": "{{department}} Onboarding Guide",
+      "content_templates": [
+        "Welcome to the {{department}} team at Acme Corp! This guide will help you get started during your first {{number}} weeks. Your manager {{manager_name}} will be your primary point of contact.",
+        "Before your first day, make sure you have access to the following systems: {{system_list}}. If you run into access issues, file a ticket in ServiceNow under the '{{department}} Access Requests' category.",
+        "During your first week, you should complete the mandatory compliance training modules at https://acmecorp.internal/training. Your buddy {{buddy_name}} from the {{department}} team will walk you through the team's daily standup process and introduce you to key stakeholders."
+      ]
+    },
+    {
+      "id": "confluence_architecture_overview",
+      "title_template": "{{department}} Architecture Overview",
+      "content_templates": [
+        "Acme Corp's {{service_name}} is built on a microservices architecture deployed on {{cloud_provider}}. The system handles approximately {{number}} requests per second at peak load and maintains {{uptime}}% uptime SLA.",
+        "The core data flow is: Client -> API Gateway ({{gateway_name}}) -> {{service_name}} -> {{database_type}} (primary) with {{cache_type}} caching layer. All inter-service communication uses gRPC with mTLS for encryption in transit.",
+        "For disaster recovery, we maintain active-passive replication across {{region_primary}} and {{region_secondary}} regions. RPO is {{number}} minutes and RTO is {{number}} minutes. Refer to the Runbook for failover procedures."
+      ]
+    },
+    {
+      "id": "confluence_api_reference",
+      "title_template": "{{service_name}} API Reference (v{{version}})",
+      "content_templates": [
+        "The {{service_name}} API provides RESTful endpoints for managing {{resource_type}} resources. Base URL: https://api.acmecorp.internal/{{service_slug}}/v{{version}}. All requests require a valid Bearer token obtained from the OAuth2 /token endpoint.",
+        "POST /{{resource_slug}} - Creates a new {{resource_type}}. Required fields: name (string), owner_id (uuid), department (enum). Optional fields: description (string, max {{number}} chars), tags (array of strings), priority (enum: low|medium|high|critical).",
+        "Rate limits: Authenticated requests are limited to {{number}} requests per minute per API key. Batch endpoints support up to {{number}} items per request. For higher limits, contact the Platform team via #platform-support."
+      ]
+    },
+    {
+      "id": "confluence_deployment_guide",
+      "title_template": "{{service_name}} Deployment Guide",
+      "content_templates": [
+        "Deployments to production follow the standard CI/CD pipeline defined in .gitlab-ci.yml. All merges to main trigger an automated build, test suite execution, and container image push to our internal registry at registry.acmecorp.internal/{{service_slug}}.",
+        "Production deployments require at least {{number}} approvals in GitLab and a passing security scan. Rolling deployments are the default strategy with {{number}}% canary traffic for the first {{number}} minutes. Rollback is automatic if error rate exceeds {{number}}%.",
+        "Post-deployment verification checklist: (1) Confirm new pods are healthy in Kubernetes dashboard, (2) Check Datadog dashboards for {{service_name}} error rates, (3) Verify smoke tests pass at https://smoke.acmecorp.internal/{{service_slug}}, (4) Update the deployment log in Confluence."
+      ]
+    },
+    {
+      "id": "confluence_security_policy",
+      "title_template": "{{department}} Security Policy",
+      "content_templates": [
+        "All Acme Corp employees in {{department}} must adhere to the following security requirements. These policies are reviewed quarterly by the Security team and were last updated on {{date}}.",
+        "Data classification levels at Acme Corp: PUBLIC (marketing materials, blog posts), INTERNAL (team docs, Slack messages), CONFIDENTIAL (customer data, financial reports), RESTRICTED (credentials, security audit findings, executive compensation). Handle each according to the Data Handling Matrix.",
+        "Incident response: If you suspect a security incident, immediately notify #security on Slack and page the on-call security engineer via PagerDuty. Do not attempt to investigate or remediate on your own. Preserve all logs and evidence. The Security team lead {{security_lead}} will coordinate the response."
+      ]
+    },
+    {
+      "id": "confluence_code_review",
+      "title_template": "{{department}} Code Review Standards",
+      "content_templates": [
+        "All code changes at Acme Corp require peer review before merging. The {{department}} team follows these guidelines to ensure high-quality, maintainable, and secure code across all {{number}}+ repositories.",
+        "Review checklist: (1) Correctness - does the logic match the requirements in the Jira ticket? (2) Security - no hardcoded secrets, SQL injection vectors, or XSS vulnerabilities. (3) Performance - no N+1 queries, appropriate indexing, bounded memory usage. (4) Testing - unit tests cover edge cases, integration tests for API changes.",
+        "Turnaround expectations: Reviews should be completed within {{number}} business hours. If a review is blocking a release, escalate in #{{department_slug}}-reviews. For changes affecting shared libraries, require an additional review from the Platform team."
+      ]
+    },
+    {
+      "id": "confluence_testing_strategy",
+      "title_template": "{{department}} Testing Strategy",
+      "content_templates": [
+        "The {{department}} team maintains a testing pyramid: {{number}}% unit tests, {{number}}% integration tests, {{number}}% end-to-end tests. Our target coverage is {{number}}% for critical paths and {{number}}% overall.",
+        "Unit tests use {{test_framework}} and must run in under {{number}} seconds per test file. Mocking external dependencies is mandatory -- no network calls in unit tests. Use the shared fixtures in tests/conftest.py for common setup.",
+        "E2E tests run nightly in our staging environment against staging.acmecorp.internal. Test results are posted to #{{department_slug}}-quality each morning. Flaky test owners are tagged automatically and have {{number}} business days to fix or quarantine the test."
+      ]
+    },
+    {
+      "id": "confluence_meeting_notes",
+      "title_template": "{{department}} {{meeting_type}} - {{date}}",
+      "content_templates": [
+        "Attendees: {{attendee_list}}. Meeting facilitated by {{facilitator_name}}.\n\nAgenda:\n1. Review action items from last {{meeting_type}}\n2. {{agenda_item_1}}\n3. {{agenda_item_2}}\n4. Open discussion",
+        "Key decisions:\n- {{decision_1}}\n- {{decision_2}}\n\nAction items:\n- {{assignee_1}}: {{action_1}} (due {{due_date}})\n- {{assignee_2}}: {{action_2}} (due {{due_date}})\n\nNext meeting: {{next_meeting_date}}",
+        "Discussion notes: {{facilitator_name}} raised the topic of {{topic}} and the team agreed to {{resolution}}. {{dissenter_name}} raised concerns about {{concern}} which will be addressed in a follow-up spike tracked in JIRA-{{ticket_number}}."
+      ]
+    },
+    {
+      "id": "confluence_project_plan",
+      "title_template": "Project Plan: {{project_name}}",
+      "content_templates": [
+        "Project: {{project_name}}\nOwner: {{project_owner}}\nTeam: {{department}}\nStatus: {{status}}\nTarget Launch: {{target_date}}\n\nObjective: {{project_objective}}",
+        "Milestones:\n- Phase 1 ({{phase1_date}}): {{phase1_goal}}\n- Phase 2 ({{phase2_date}}): {{phase2_goal}}\n- Phase 3 ({{phase3_date}}): {{phase3_goal}}\n\nDependencies: {{dependency_list}}. Risks: {{risk_list}}.",
+        "Resource allocation: {{number}} engineers, {{number}} designer(s), {{number}} PM. Total estimated effort: {{number}} person-weeks. Budget approved by {{approver_name}} on {{date}}."
+      ]
+    },
+    {
+      "id": "confluence_best_practices_general",
+      "title_template": "{{department}} Best Practices",
+      "content_templates": [
+        "This page documents the agreed-upon best practices for the {{department}} team at Acme Corp. These guidelines were established based on retrospectives and incident post-mortems from Q{{quarter}} {{year}}.",
+        "Communication norms: Use #{{department_slug}} for general discussion, #{{department_slug}}-alerts for automated notifications, and #{{department_slug}}-support for cross-team requests. Tag @{{department_slug}}-oncall for urgent issues outside business hours.",
+        "Documentation standards: All new features must have a corresponding Confluence page under the {{department}} space. Architecture Decision Records (ADRs) are required for decisions affecting system boundaries, data models, or external APIs. Use the ADR template at /templates/adr."
+      ]
+    },
+    {
+      "id": "confluence_incident_playbook",
+      "title_template": "{{service_name}} Incident Playbook",
+      "content_templates": [
+        "This playbook covers common incident scenarios for {{service_name}} and their resolution steps. Severity levels: SEV1 (complete outage, all hands), SEV2 (partial degradation, on-call + backup), SEV3 (minor issue, on-call only).",
+        "Scenario: High error rate on {{service_name}}\n1. Check Datadog dashboard: https://datadog.acmecorp.internal/dash/{{service_slug}}\n2. Verify database connectivity to {{database_type}} cluster\n3. Check recent deployments in GitLab for {{service_slug}}\n4. If caused by bad deploy, initiate rollback via `kubectl rollout undo deployment/{{service_slug}} -n production`",
+        "Escalation matrix:\n- First {{number}} minutes: On-call engineer (PagerDuty)\n- After {{number}} minutes: Engineering Manager {{manager_name}}\n- After {{number}} minutes: VP Engineering {{vp_name}}\n- Customer-facing impact: Loop in Customer Success lead {{cs_lead}}"
+      ]
+    },
+    {
+      "id": "confluence_data_pipeline",
+      "title_template": "{{department}} Data Pipeline Documentation",
+      "content_templates": [
+        "The {{department}} data pipeline ingests data from {{number}} sources and processes approximately {{number}} events per day. The pipeline runs on Apache Airflow with DAGs scheduled at various intervals depending on data freshness requirements.",
+        "Data sources: {{source_list}}. Each source has a dedicated ingestion connector that handles schema validation, deduplication, and dead-letter routing. Failed records are sent to the DLQ in {{queue_service}} for manual review.",
+        "Data quality checks run after each pipeline stage. We monitor for: null rates exceeding {{number}}%, schema drift, row count anomalies (>{{number}}% deviation from baseline), and freshness SLA violations. Alerts go to #{{department_slug}}-data-quality."
+      ]
+    },
+    {
+      "id": "confluence_vendor_evaluation",
+      "title_template": "{{vendor_category}} Vendor Evaluation - {{year}}",
+      "content_templates": [
+        "This document summarizes the {{department}} team's evaluation of {{vendor_category}} vendors for Acme Corp. Evaluation period: {{start_date}} to {{end_date}}. Evaluation committee: {{evaluator_list}}.",
+        "Evaluation criteria (weighted): Functionality ({{number}}%), Security & Compliance ({{number}}%), Cost ({{number}}%), Integration Ease ({{number}}%), Support Quality ({{number}}%). Each vendor scored 1-5 on each criterion.",
+        "Recommendation: Based on the scoring matrix, we recommend {{recommended_vendor}} with a total weighted score of {{score}}/5.0. Key strengths: {{strengths}}. Key risks: {{risks}}. Procurement to begin pending {{approver_name}} approval."
+      ]
+    },
+    {
+      "id": "confluence_quarterly_okrs",
+      "title_template": "{{department}} OKRs - Q{{quarter}} {{year}}",
+      "content_templates": [
+        "Objective 1: {{objective_1}}\n- KR1: {{kr_1}} (target: {{target_1}}, current: {{current_1}})\n- KR2: {{kr_2}} (target: {{target_2}}, current: {{current_2}})\n- KR3: {{kr_3}} (target: {{target_3}}, current: {{current_3}})",
+        "Objective 2: {{objective_2}}\n- KR1: {{kr_4}} (target: {{target_4}}, current: {{current_4}})\n- KR2: {{kr_5}} (target: {{target_5}}, current: {{current_5}})\n\nOwner: {{okr_owner}}. Weekly check-in: {{meeting_day}} at {{meeting_time}}.",
+        "Dependencies on other teams: {{dependency_list}}. Risks to delivery: {{risk_list}}. Mitigation plans documented in the associated project plans linked above."
+      ]
+    },
+    {
+      "id": "confluence_process_doc",
+      "title_template": "{{process_name}} Process Document",
+      "content_templates": [
+        "Process: {{process_name}}\nOwner: {{process_owner}}\nDepartment: {{department}}\nLast reviewed: {{date}}\nNext review: {{next_review_date}}\n\nPurpose: This document describes the standard process for {{process_description}} at Acme Corp.",
+        "Steps:\n1. {{step_1}}\n2. {{step_2}}\n3. {{step_3}}\n4. {{step_4}}\n5. {{step_5}}\n\nApproval required from: {{approver_role}}. SLA: {{number}} business days.",
+        "Exceptions: If {{exception_condition}}, escalate to {{escalation_contact}} in the {{department}} team. Exceptions must be documented in the process exception log and reviewed during the next quarterly audit."
+      ]
+    },
+    {
+      "id": "confluence_new_hire_checklist",
+      "title_template": "New Hire Checklist - {{department}}",
+      "content_templates": [
+        "Welcome to Acme Corp! This checklist ensures you have everything set up for a productive start in the {{department}} team.\n\nDay 1:\n- [ ] Laptop setup and VPN configuration\n- [ ] Slack workspace access (join #general, #{{department_slug}})\n- [ ] 1:1 with manager {{manager_name}}",
+        "Week 1:\n- [ ] Complete security awareness training\n- [ ] Set up development environment (see {{department}} Dev Setup Guide)\n- [ ] Read the {{department}} Architecture Overview\n- [ ] Attend team standup and sprint planning\n- [ ] Meet your onboarding buddy {{buddy_name}}",
+        "First 30 days:\n- [ ] Complete {{number}} starter tickets from the backlog\n- [ ] Shadow an on-call rotation\n- [ ] Present a short intro at the {{department}} team all-hands\n- [ ] Provide feedback on the onboarding process to {{hr_contact}}"
+      ]
+    },
+    {
+      "id": "confluence_runbook_template",
+      "title_template": "Runbook: {{runbook_topic}}",
+      "content_templates": [
+        "Runbook: {{runbook_topic}}\nService: {{service_name}}\nOwner: {{runbook_owner}}\nSeverity: {{severity}}\nLast tested: {{date}}\n\nPrerequisites: Access to {{prerequisite_list}}. Familiarity with {{tool_list}}.",
+        "Symptoms:\n- {{symptom_1}}\n- {{symptom_2}}\n- {{symptom_3}}\n\nDiagnosis steps:\n1. Check {{monitoring_tool}} dashboard for {{service_name}}\n2. Review logs: `kubectl logs -n production -l app={{service_slug}} --tail={{number}}`\n3. Verify connectivity to downstream dependencies: {{dependency_list}}",
+        "Resolution:\n1. {{resolution_step_1}}\n2. {{resolution_step_2}}\n3. {{resolution_step_3}}\n\nValidation: Confirm resolution by checking {{validation_endpoint}} returns HTTP 200 and latency is below {{number}}ms. Update the incident timeline and notify #incidents."
+      ]
+    }
+  ]
+}

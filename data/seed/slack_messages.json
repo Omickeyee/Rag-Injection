@@ -1,0 +1,144 @@
+{
+  "source_type": "slack",
+  "channels": [
+    "#engineering",
+    "#general",
+    "#product",
+    "#incidents",
+    "#random",
+    "#security",
+    "#devops"
+  ],
+  "access_levels": ["public", "internal"],
+  "trust_score_range": [0.4, 0.7],
+  "templates": [
+    {
+      "id": "slack_question",
+      "message_templates": [
+        "Hey team, does anyone know how to configure {{tool_name}} for the {{service_name}} project? I've been stuck on this for a bit. cc @{{mentioned_user}}",
+        "Quick question -- what's the correct endpoint for {{service_name}} in staging? The docs page seems outdated.",
+        "Has anyone run into issues with {{tool_name}} after the latest update? My builds keep failing with `{{error_message}}`."
+      ]
+    },
+    {
+      "id": "slack_announcement",
+      "message_templates": [
+        "Team announcement: Starting next {{day_of_week}}, we're moving our standup from {{old_time}} to {{new_time}}. Please update your calendars.",
+        "Heads up everyone: {{service_name}} will be undergoing scheduled maintenance on {{date}} from {{start_time}} to {{end_time}} UTC. Expect brief downtime.",
+        "Exciting news! We just hit {{number}} active users on {{product_name}}. Huge thanks to everyone who contributed to the Q{{quarter}} push."
+      ]
+    },
+    {
+      "id": "slack_incident_update",
+      "message_templates": [
+        "INCIDENT: {{service_name}} is experiencing elevated error rates. Current error rate: {{number}}%. On-call {{oncall_name}} is investigating. Impact: {{impact_description}}.",
+        "Update on the {{service_name}} incident: Root cause identified as {{root_cause}}. Deploying fix now. ETA to resolution: {{number}} minutes.",
+        "RESOLVED: {{service_name}} incident is resolved. Total downtime: {{number}} minutes. Post-mortem will be scheduled for {{date}}. Thanks to {{oncall_name}} and {{helper_name}} for the quick response."
+      ]
+    },
+    {
+      "id": "slack_code_review_request",
+      "message_templates": [
+        "PR ready for review: {{pr_title}} ({{pr_url}}). It's a {{change_size}} change touching {{service_name}}. Would appreciate eyes from someone familiar with {{component_name}}.",
+        "Can someone take a look at my PR? {{pr_url}} -- It fixes the {{bug_description}} issue we've been seeing in production. Pretty straightforward change.",
+        "Need a second review on {{pr_url}} before we can merge. It's blocking the {{feature_name}} release. @{{reviewer_name}} could you take a look when you get a chance?"
+      ]
+    },
+    {
+      "id": "slack_deployment_notification",
+      "message_templates": [
+        "Deploying {{service_name}} v{{version}} to production. Changes: {{change_summary}}. Rollback plan: revert to v{{previous_version}}.",
+        "{{service_name}} v{{version}} is now live in production. Canary looks clean after {{number}} minutes. Monitoring dashboards: {{dashboard_url}}.",
+        "FYI: {{service_name}} deploy to staging complete. Running smoke tests now. Will promote to prod after validation. ETA: {{number}} minutes."
+      ]
+    },
+    {
+      "id": "slack_casual_work",
+      "message_templates": [
+        "Just wrapped up the {{task_name}} spike. TL;DR: we should go with {{recommendation}} because {{reason}}. Full write-up in Confluence: {{confluence_url}}.",
+        "Anyone free for a quick pairing session? I'm working on {{task_name}} and could use a second brain on the {{component_name}} logic.",
+        "Finally figured out why {{service_name}} was being flaky in tests -- turns out the {{component_name}} mock wasn't resetting state between runs. Fix is up: {{pr_url}}."
+      ]
+    },
+    {
+      "id": "slack_devops",
+      "message_templates": [
+        "Heads up: upgrading the {{cluster_name}} Kubernetes cluster to v{{version}} this weekend. All services should be unaffected but please report any issues in #devops.",
+        "New Terraform module for {{resource_type}} is available in the infra repo. Docs: {{docs_url}}. Migrating existing resources is optional but recommended before end of Q{{quarter}}.",
+        "PSA: We're hitting {{number}}% of our {{cloud_provider}} quota for {{resource_type}} in the {{region}} region. Please clean up unused resources. I'll be doing an audit next {{day_of_week}}."
+      ]
+    },
+    {
+      "id": "slack_security_alert",
+      "message_templates": [
+        "Security reminder: Please rotate your API tokens if they were created before {{date}}. Instructions: {{docs_url}}. Deadline: end of this {{day_of_week}}.",
+        "FYI: We've enabled mandatory 2FA for all Acme Corp GitHub repositories. If you haven't set it up yet, you'll be locked out starting {{date}}. Setup guide: {{docs_url}}.",
+        "Completed the dependency audit for {{service_name}}. Found {{number}} vulnerabilities ({{critical_count}} critical). PRs are up to bump the affected packages. Please review and merge ASAP."
+      ]
+    },
+    {
+      "id": "slack_random_chat",
+      "message_templates": [
+        "Anyone want to grab lunch at {{restaurant_name}} today? Thinking around {{time}}.",
+        "TIL that {{tool_name}} has a {{feature_name}} feature. Would have saved me hours last sprint if I'd known.",
+        "The new {{product_name}} release blog post is live: {{blog_url}}. Nice work to everyone who contributed, especially the {{department}} team."
+      ]
+    },
+    {
+      "id": "slack_onboarding_help",
+      "message_templates": [
+        "Welcome @{{new_hire_name}}! They're joining the {{department}} team starting today. Please say hi and help them feel at home!",
+        "@{{new_hire_name}} for your dev setup, follow the guide here: {{docs_url}}. If you hit any snags, ping me or @{{buddy_name}} and we'll sort it out.",
+        "Pro tip for new folks: bookmark the {{department}} Confluence space ({{confluence_url}}) -- it has pretty much everything you'll need in your first month."
+      ]
+    },
+    {
+      "id": "slack_sprint_update",
+      "message_templates": [
+        "Sprint {{sprint_number}} update: {{completed_count}}/{{total_count}} stories completed. Velocity: {{velocity}} points. Blockers: {{blocker_list}}. Retro on {{date}}.",
+        "Reminder: Sprint {{sprint_number}} ends {{day_of_week}}. Please update your Jira tickets and log any remaining hours. Demo at {{time}} on {{date}}.",
+        "Sprint planning for Sprint {{sprint_number}} is tomorrow at {{time}}. Please groom your backlog items beforehand. Focus areas: {{focus_areas}}."
+      ]
+    },
+    {
+      "id": "slack_outage_comms",
+      "message_templates": [
+        "We're seeing {{symptom}} on {{service_name}}. Checking if it's related to the {{cloud_provider}} incident reported on their status page. Will update in {{number}} minutes.",
+        "Customer-facing impact confirmed. {{number}} support tickets filed in the last {{number}} minutes about {{symptom}}. Customer Success is sending a status update to affected accounts.",
+        "All clear. The {{service_name}} issue was caused by {{root_cause}}. We've applied a hotfix and are monitoring. Full post-mortem doc will be shared in #incidents by EOD {{day_of_week}}."
+      ]
+    },
+    {
+      "id": "slack_knowledge_sharing",
+      "message_templates": [
+        "Just published a blog post internally about {{topic}}: {{url}}. Covers the lessons we learned during the {{project_name}} migration. Feedback welcome!",
+        "Reminder: {{presenter_name}} is doing a tech talk on {{topic}} this {{day_of_week}} at {{time}} in {{room_name}} (also on Zoom). Highly recommend if you work on {{service_name}}.",
+        "Shared a new Runbook for handling {{scenario}} on {{service_name}}: {{confluence_url}}. On-call engineers, please review before your next rotation."
+      ]
+    },
+    {
+      "id": "slack_feature_discussion",
+      "message_templates": [
+        "Thinking about adding {{feature_name}} to {{product_name}}. Main concern is the impact on {{component_name}} latency. Has anyone benchmarked something similar?",
+        "The {{feature_name}} RFC is ready for comments: {{docs_url}}. Key open question: should we build this in-house or integrate with {{vendor_name}}? Pros/cons in the doc.",
+        "Shipped {{feature_name}} to 10% of users via feature flag. Early metrics look promising: {{metric_name}} up {{number}}%. Will ramp to 50% next week if stable."
+      ]
+    },
+    {
+      "id": "slack_gratitude",
+      "message_templates": [
+        "Huge shoutout to @{{user_name}} for jumping in on the {{service_name}} incident last night. Quick thinking on the {{solution}} saved us hours of downtime.",
+        "Thanks @{{user_name}} for the thorough code review on my PR. The suggestions around {{topic}} were really helpful and I learned a lot.",
+        "Kudos to the {{department}} team for shipping {{feature_name}} ahead of schedule. The cross-functional collaboration with {{other_department}} was excellent."
+      ]
+    },
+    {
+      "id": "slack_tooling_update",
+      "message_templates": [
+        "Heads up: we're migrating from {{old_tool}} to {{new_tool}} for {{purpose}}. Migration guide: {{docs_url}}. Deadline to switch: {{date}}.",
+        "New internal CLI tool dropped: `acme-{{tool_slug}}`. It automates {{task_description}}. Install via `brew install acme-{{tool_slug}}` or grab it from the releases page: {{url}}.",
+        "Updated the CI pipeline to include {{tool_name}} checks. If your builds start failing, it's probably a formatting issue. Run `{{fix_command}}` locally to auto-fix."
+      ]
+    }
+  ]
+}

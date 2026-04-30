@@ -1,8 +1,0 @@
-torch==2.8.0
-transformers==4.56.1
-sentence-transformers==5.4.1
-numpy==1.26.4
-langchain-community==0.4.1
-langchain-huggingface==1.2.2
-streamlit==1.44.1
- 

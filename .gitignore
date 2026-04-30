@@ -17,6 +17,7 @@ build/
 
 # Chroma
 .chroma/
+chroma_db/
 
 # IDE
 .vscode/
@@ -40,3 +41,5 @@ suspicion_model/tokenizer.json
 suspicion_model/train.json
 suspicion_model/vocab.txt
 red_team_attacker.py
+models/
+data/generated/

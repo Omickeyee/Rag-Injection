@@ -1,0 +1,132 @@
+{
+  "source_type": "internal_doc",
+  "doc_types": [
+    "API Specification",
+    "Architecture Decision Record",
+    "Runbook",
+    "Post-mortem",
+    "Design Doc",
+    "Security Audit"
+  ],
+  "access_levels": ["internal", "confidential", "restricted"],
+  "trust_score_range": [0.8, 0.98],
+  "templates": [
+    {
+      "id": "internal_api_spec",
+      "doc_type": "API Specification",
+      "title_template": "{{service_name}} API Specification v{{version}}",
+      "content_templates": [
+        "API Specification: {{service_name}} v{{version}}\nOwner: {{owner_name}}, {{department}}\nStatus: {{status}}\nLast updated: {{date}}\n\nOverview: The {{service_name}} API provides programmatic access to {{resource_description}} within the Acme Corp platform. This service handles approximately {{number}} requests per day and is classified as Tier {{tier}} ({{tier_description}}).",
+        "Authentication: All API requests must include a valid Bearer token in the Authorization header. Tokens are issued by the Acme Corp Identity Service (OAuth2 client credentials flow). Token lifetime: {{number}} hours. Scopes: {{scope_list}}.\n\nBase URL: https://api.acmecorp.internal/{{service_slug}}/v{{version}}\nStaging: https://api.staging.acmecorp.internal/{{service_slug}}/v{{version}}",
+        "Endpoints:\n\nGET /{{resource_slug}}\n  Description: List all {{resource_type}} resources\n  Query params: page (int), per_page (int, max {{number}}), filter (string), sort_by (enum: created_at|updated_at|name)\n  Response: 200 OK with paginated array of {{resource_type}} objects\n\nPOST /{{resource_slug}}\n  Description: Create a new {{resource_type}}\n  Body: { name: string (required), description: string, owner_id: uuid (required), metadata: object }\n  Response: 201 Created with {{resource_type}} object\n  Errors: 400 (validation), 409 (duplicate name), 429 (rate limited)\n\nGET /{{resource_slug}}/{id}\n  Description: Retrieve a specific {{resource_type}}\n  Response: 200 OK with {{resource_type}} object, 404 if not found\n\nPATCH /{{resource_slug}}/{id}\n  Description: Update a {{resource_type}}\n  Body: Partial {{resource_type}} object\n  Response: 200 OK with updated object\n\nDELETE /{{resource_slug}}/{id}\n  Description: Soft-delete a {{resource_type}} (recoverable for {{number}} days)\n  Response: 204 No Content"
+      ]
+    },
+    {
+      "id": "internal_adr",
+      "doc_type": "Architecture Decision Record",
+      "title_template": "ADR-{{adr_number}}: {{decision_title}}",
+      "content_templates": [
+        "Architecture Decision Record\nADR-{{adr_number}}: {{decision_title}}\nDate: {{date}}\nStatus: {{status}}\nDeciders: {{decider_list}}\nTechnical Story: JIRA-{{ticket_number}}\n\nContext:\n{{context_description}}\n\nThe {{department}} team needs to decide {{decision_question}}. This decision impacts {{impact_scope}} and will be difficult to reverse after {{reversal_deadline}}.",
+        "Decision:\nWe will use {{chosen_option}}.\n\nConsidered alternatives:\n1. {{option_1}}: {{option_1_pros}}. Rejected because {{option_1_cons}}.\n2. {{option_2}}: {{option_2_pros}}. Rejected because {{option_2_cons}}.\n3. {{chosen_option}}: {{chosen_pros}}.\n\nConsequences:\n- Positive: {{positive_consequence_1}}, {{positive_consequence_2}}\n- Negative: {{negative_consequence_1}}\n- Neutral: {{neutral_consequence_1}}\n\nCompliance: This decision has been reviewed by {{reviewer}} for alignment with Acme Corp's architecture principles and security requirements."
+      ]
+    },
+    {
+      "id": "internal_runbook",
+      "doc_type": "Runbook",
+      "title_template": "Runbook: {{runbook_title}}",
+      "content_templates": [
+        "Runbook: {{runbook_title}}\nService: {{service_name}}\nOwner: {{owner_name}}\nLast tested: {{date}}\nNext scheduled test: {{next_test_date}}\nSeverity: {{severity}}\n\nScope: This runbook covers {{scope_description}} for the {{service_name}} service. It should be used when {{trigger_condition}}.",
+        "Prerequisites:\n- Access to the {{cluster_name}} Kubernetes cluster (request via IT portal)\n- {{cloud_provider}} console access with {{iam_role}} role\n- Familiarity with {{tool_list}}\n- PagerDuty responder permissions\n\nDiagnosis:\n1. Check service health: `curl -s https://{{service_slug}}.acmecorp.internal/health | jq .`\n2. Review error logs: `kubectl logs -n {{namespace}} deployment/{{service_slug}} --tail=500 --since=30m`\n3. Check dependency status: {{dependency_check_commands}}\n4. Review recent changes: `kubectl rollout history deployment/{{service_slug}} -n {{namespace}}`",
+        "Remediation:\n\nScenario A - {{scenario_a_name}}:\n1. {{scenario_a_step_1}}\n2. {{scenario_a_step_2}}\n3. {{scenario_a_step_3}}\n\nScenario B - {{scenario_b_name}}:\n1. {{scenario_b_step_1}}\n2. {{scenario_b_step_2}}\n3. {{scenario_b_step_3}}\n\nRollback procedure:\n1. `kubectl rollout undo deployment/{{service_slug}} -n {{namespace}}`\n2. Verify health endpoint returns 200\n3. Monitor error rate in Datadog for {{number}} minutes\n4. Notify #incidents channel with status update\n\nEscalation: If unresolved after {{number}} minutes, page {{escalation_contact}} via PagerDuty."
+      ]
+    },
+    {
+      "id": "internal_postmortem",
+      "doc_type": "Post-mortem",
+      "title_template": "Post-mortem: {{incident_title}} ({{date}})",
+      "content_templates": [
+        "Post-mortem Report\nIncident: {{incident_title}}\nDate: {{date}}\nSeverity: {{severity}}\nDuration: {{duration}} minutes\nAuthors: {{author_list}}\nStatus: {{status}}\n\nSummary: On {{date}} at {{time}} UTC, {{incident_summary}}. The incident affected {{affected_systems}} and impacted approximately {{number}} users for {{duration}} minutes.",
+        "Timeline (all times UTC):\n- {{time_1}}: {{event_1}}\n- {{time_2}}: {{event_2}}\n- {{time_3}}: {{event_3}}\n- {{time_4}}: {{event_4}}\n- {{time_5}}: {{event_5}}\n- {{time_6}}: Incident resolved\n\nRoot cause: {{root_cause_description}}\n\nContributing factors:\n1. {{contributing_factor_1}}\n2. {{contributing_factor_2}}\n3. {{contributing_factor_3}}",
+        "Impact:\n- Customer impact: {{customer_impact}}\n- Revenue impact: Estimated ${{revenue_impact}} in lost {{revenue_type}}\n- SLA impact: {{sla_impact}}\n\nAction items:\n| # | Action | Owner | Priority | Due Date | Status |\n|---|--------|-------|----------|----------|--------|\n| 1 | {{action_1}} | {{owner_1}} | {{priority_1}} | {{due_1}} | {{status_1}} |\n| 2 | {{action_2}} | {{owner_2}} | {{priority_2}} | {{due_2}} | {{status_2}} |\n| 3 | {{action_3}} | {{owner_3}} | {{priority_3}} | {{due_3}} | {{status_3}} |\n| 4 | {{action_4}} | {{owner_4}} | {{priority_4}} | {{due_4}} | {{status_4}} |\n\nLessons learned:\n- What went well: {{went_well}}\n- What could be improved: {{could_improve}}\n- Where we got lucky: {{got_lucky}}"
+      ]
+    },
+    {
+      "id": "internal_design_doc",
+      "doc_type": "Design Doc",
+      "title_template": "Design Doc: {{feature_name}}",
+      "content_templates": [
+        "Design Document: {{feature_name}}\nAuthor: {{author_name}}\nReviewers: {{reviewer_list}}\nStatus: {{status}}\nCreated: {{date}}\nLast updated: {{date}}\nJIRA: {{ticket_number}}\n\nObjective: {{objective_description}}\n\nBackground: {{background_description}}. Currently, {{current_state}}. This design proposes {{proposed_change}} to address {{problem_statement}}.",
+        "Proposed Design:\n\n{{design_overview}}\n\nSystem components:\n1. {{component_1}}: {{component_1_description}}\n2. {{component_2}}: {{component_2_description}}\n3. {{component_3}}: {{component_3_description}}\n\nData model changes:\n- New table: {{table_name}} with columns ({{column_list}})\n- Modified table: {{existing_table}} - add column {{new_column}} ({{column_type}})\n\nAPI changes:\n- New endpoint: {{http_method}} /{{endpoint_path}} - {{endpoint_description}}\n- Modified endpoint: {{modified_endpoint}} - {{modification_description}}",
+        "Alternatives considered:\n1. {{alternative_1}}: {{alt_1_description}}. Rejected because {{alt_1_rejection}}.\n2. {{alternative_2}}: {{alt_2_description}}. Rejected because {{alt_2_rejection}}.\n\nRisks and mitigations:\n- Risk: {{risk_1}}. Mitigation: {{mitigation_1}}.\n- Risk: {{risk_2}}. Mitigation: {{mitigation_2}}.\n\nRollout plan:\n1. Phase 1: {{phase_1}} (behind feature flag, {{number}}% rollout)\n2. Phase 2: {{phase_2}} ({{number}}% rollout, monitor for {{number}} days)\n3. Phase 3: {{phase_3}} (GA, remove feature flag)\n\nSuccess metrics:\n- {{metric_1}}: target {{target_1}}\n- {{metric_2}}: target {{target_2}}\n\nEstimated effort: {{number}} person-weeks. Target completion: {{target_date}}."
+      ]
+    },
+    {
+      "id": "internal_security_audit",
+      "doc_type": "Security Audit",
+      "title_template": "Security Audit: {{audit_target}} (Q{{quarter}} {{year}})",
+      "content_templates": [
+        "Security Audit Report\nTarget: {{audit_target}}\nAudit period: {{start_date}} to {{end_date}}\nAuditor: {{auditor_name}}, Security Team\nClassification: RESTRICTED\n\nExecutive summary: This audit assessed the security posture of {{audit_target}}. We identified {{total_findings}} findings: {{critical_count}} critical, {{high_count}} high, {{medium_count}} medium, {{low_count}} low. Overall risk rating: {{risk_rating}}.",
+        "Findings:\n\nFinding 1: {{finding_1_title}}\nSeverity: {{finding_1_severity}}\nDescription: {{finding_1_description}}\nImpact: {{finding_1_impact}}\nRemediation: {{finding_1_remediation}}\nDeadline: {{finding_1_deadline}}\nOwner: {{finding_1_owner}}\n\nFinding 2: {{finding_2_title}}\nSeverity: {{finding_2_severity}}\nDescription: {{finding_2_description}}\nImpact: {{finding_2_impact}}\nRemediation: {{finding_2_remediation}}\nDeadline: {{finding_2_deadline}}\nOwner: {{finding_2_owner}}",
+        "Compliance status:\n- SOC 2 Type II: {{soc2_status}}\n- GDPR: {{gdpr_status}}\n- HIPAA: {{hipaa_status}} (if applicable)\n- PCI DSS: {{pci_status}} (if applicable)\n\nAccess control review:\n- Total users with access: {{number}}\n- Users with admin/elevated privileges: {{number}}\n- Stale accounts (>{{number}} days inactive): {{number}}\n- Service accounts: {{number}} ({{number}} with rotation policy)\n\nRecommendations:\n1. {{recommendation_1}}\n2. {{recommendation_2}}\n3. {{recommendation_3}}\n\nNext audit scheduled: Q{{next_quarter}} {{year}}. Follow-up on critical findings: {{followup_date}}."
+      ]
+    },
+    {
+      "id": "internal_data_architecture",
+      "doc_type": "Architecture Decision Record",
+      "title_template": "Data Architecture: {{system_name}}",
+      "content_templates": [
+        "Data Architecture Document\nSystem: {{system_name}}\nOwner: {{owner_name}}, Data Engineering\nStatus: {{status}}\nLast updated: {{date}}\n\nOverview: The {{system_name}} data architecture supports Acme Corp's {{use_case}} requirements. The system processes {{number}} events per day with a p99 latency of {{number}}ms for read queries and {{number}}ms for write operations.",
+        "Storage layer:\n- Primary database: {{database_type}} ({{database_version}}) on {{cloud_provider}} {{managed_service}}\n- Read replicas: {{number}} replicas across {{number}} availability zones\n- Caching: {{cache_type}} cluster ({{number}} nodes, {{number}}GB memory)\n- Object storage: {{cloud_provider}} {{object_store}} for {{object_store_purpose}}\n- Search index: {{search_engine}} for full-text search across {{number}} document types\n\nData pipeline:\n- Ingestion: {{ingestion_tool}} reading from {{source_list}}\n- Processing: {{processing_framework}} jobs running on {{compute_platform}}\n- Orchestration: Apache Airflow with {{number}} DAGs, scheduled intervals from 5min to 24h\n- Monitoring: {{monitoring_tool}} with alerts for pipeline failures, data quality, and freshness SLA violations",
+        "Data governance:\n- PII handling: All PII fields are encrypted at rest using {{encryption_method}} and masked in non-production environments using {{masking_tool}}\n- Retention policy: Raw events retained for {{number}} days, aggregated data for {{number}} months, compliance archives for {{number}} years\n- Access control: Role-based access via {{access_tool}}. Data access requests require manager approval and are audited quarterly\n- Backup strategy: Automated daily snapshots retained for {{number}} days. Point-in-time recovery enabled with {{number}} hour RPO\n\nScaling considerations: Current capacity supports {{number}}x projected growth over {{number}} months. Horizontal scaling plan documented in ADR-{{adr_number}}."
+      ]
+    },
+    {
+      "id": "internal_ops_runbook",
+      "doc_type": "Runbook",
+      "title_template": "Operations Runbook: {{operation_name}}",
+      "content_templates": [
+        "Operations Runbook: {{operation_name}}\nCategory: {{category}}\nFrequency: {{frequency}}\nOwner: {{owner_name}}, {{department}}\nLast executed: {{date}}\nEstimated duration: {{number}} minutes\n\nPurpose: This runbook documents the procedure for {{operation_description}} at Acme Corp. It is executed {{frequency}} and requires {{access_requirements}}.",
+        "Pre-execution checklist:\n- [ ] Verify you have {{access_requirements}}\n- [ ] Notify #{{notification_channel}} that {{operation_name}} is starting\n- [ ] Confirm no conflicting maintenance windows on {{affected_systems}}\n- [ ] Take pre-operation snapshot: `{{snapshot_command}}`\n\nProcedure:\n1. {{step_1}}\n2. {{step_2}}\n3. {{step_3}}\n4. {{step_4}}\n5. {{step_5}}\n\nExpected output: {{expected_output}}",
+        "Post-execution verification:\n1. Verify {{verification_1}}\n2. Confirm {{verification_2}}\n3. Check monitoring dashboard: {{dashboard_url}}\n\nRollback procedure (if needed):\n1. {{rollback_step_1}}\n2. {{rollback_step_2}}\n3. Notify {{escalation_contact}} if rollback fails\n\nCommon issues:\n- Issue: {{common_issue_1}}. Fix: {{fix_1}}\n- Issue: {{common_issue_2}}. Fix: {{fix_2}}\n\nCompletion: Update the operations log at {{log_url}} and notify #{{notification_channel}} that {{operation_name}} is complete."
+      ]
+    },
+    {
+      "id": "internal_capacity_plan",
+      "doc_type": "Design Doc",
+      "title_template": "Capacity Planning: {{service_name}} ({{year}})",
+      "content_templates": [
+        "Capacity Planning Report\nService: {{service_name}}\nPeriod: Q{{quarter}} {{year}} - Q{{end_quarter}} {{year}}\nAuthor: {{author_name}}, {{department}}\nStatus: {{status}}\n\nCurrent utilization:\n- CPU: {{cpu_pct}}% average, {{cpu_peak_pct}}% peak\n- Memory: {{mem_pct}}% average, {{mem_peak_pct}}% peak\n- Storage: {{storage_used}}TB / {{storage_total}}TB ({{storage_pct}}%)\n- Network: {{network_pct}}% of allocated bandwidth",
+        "Growth projections:\n- Current traffic: {{current_rps}} requests/second (p50: {{p50_latency}}ms, p99: {{p99_latency}}ms)\n- Projected traffic (end of {{year}}): {{projected_rps}} requests/second\n- Growth rate: {{growth_rate}}% month-over-month\n- Key growth drivers: {{growth_drivers}}\n\nCapacity needs:\n- Additional compute: {{number}} {{instance_type}} instances\n- Additional storage: {{number}}TB\n- Database scaling: Upgrade from {{current_db_size}} to {{target_db_size}}\n- Estimated cost increase: ${{monthly_cost}}/month\n\nTimeline:\n- {{date_1}}: {{scaling_action_1}}\n- {{date_2}}: {{scaling_action_2}}\n- {{date_3}}: {{scaling_action_3}}\n\nBudget approval required from {{approver_name}} by {{approval_deadline}}."
+      ]
+    },
+    {
+      "id": "internal_compliance_report",
+      "doc_type": "Security Audit",
+      "title_template": "Compliance Report: {{compliance_framework}} ({{year}})",
+      "content_templates": [
+        "Compliance Report\nFramework: {{compliance_framework}}\nScope: {{scope_description}}\nAssessment period: {{start_date}} to {{end_date}}\nAssessor: {{assessor_name}}\nClassification: RESTRICTED\n\nOverall compliance status: {{compliance_status}}\n\nControl categories assessed: {{number}}\nControls in scope: {{number}}\nControls passing: {{number}}\nControls with findings: {{number}}\nControls not applicable: {{number}}",
+        "Key findings:\n\n1. {{finding_1_title}} ({{finding_1_severity}})\n   Control: {{finding_1_control_id}}\n   Gap: {{finding_1_gap}}\n   Remediation plan: {{finding_1_remediation}}\n   Target date: {{finding_1_target_date}}\n\n2. {{finding_2_title}} ({{finding_2_severity}})\n   Control: {{finding_2_control_id}}\n   Gap: {{finding_2_gap}}\n   Remediation plan: {{finding_2_remediation}}\n   Target date: {{finding_2_target_date}}",
+        "Evidence collected:\n- Access control lists for {{number}} systems\n- Encryption configuration for {{number}} data stores\n- Audit logs spanning {{number}} months\n- Employee training records for {{number}} employees\n- Vendor security assessments for {{number}} third parties\n\nNext steps:\n1. Remediate all critical and high findings by {{remediation_deadline}}\n2. Schedule follow-up assessment for {{followup_date}}\n3. Present findings to the Audit Committee on {{committee_date}}\n4. Update the risk register with new findings\n\nContact: {{contact_name}} ({{contact_email}}), Security & Compliance team"
+      ]
+    },
+    {
+      "id": "internal_migration_plan",
+      "doc_type": "Design Doc",
+      "title_template": "Migration Plan: {{migration_title}}",
+      "content_templates": [
+        "Migration Plan: {{migration_title}}\nAuthor: {{author_name}}\nReviewers: {{reviewer_list}}\nStatus: {{status}}\nTarget start: {{start_date}}\nTarget completion: {{end_date}}\n\nObjective: Migrate {{migration_source}} to {{migration_target}}. This migration is necessary because {{migration_reason}}. Estimated impact: {{number}} services, {{number}} teams, {{number}} data records.",
+        "Migration strategy: {{strategy_type}} ({{strategy_description}})\n\nPhases:\n1. Preparation ({{prep_duration}}): Set up {{migration_target}}, create data mapping, build migration scripts, establish rollback procedures\n2. Dual-write ({{dualwrite_duration}}): Write to both {{migration_source}} and {{migration_target}}. Verify data consistency with reconciliation jobs running every {{number}} minutes\n3. Cutover ({{cutover_duration}}): Switch reads to {{migration_target}}. Monitor for {{number}} hours. Keep {{migration_source}} as fallback\n4. Cleanup ({{cleanup_duration}}): Decommission {{migration_source}} after {{number}} days of stable operation\n\nRollback criteria: Rollback if error rate exceeds {{number}}% or latency p99 exceeds {{number}}ms during any phase.",
+        "Risk assessment:\n- Risk: Data loss during migration. Mitigation: Full backup before each phase, checksums on all migrated records.\n- Risk: Extended downtime. Mitigation: {{strategy_type}} strategy allows zero-downtime migration.\n- Risk: Application incompatibility. Mitigation: Shadow testing in staging for {{number}} weeks before production start.\n\nResource requirements: {{number}} engineers for {{number}} weeks. Infrastructure cost during dual-write phase: approximately ${{cost}}/month additional.\n\nSuccess criteria:\n- All {{number}} records migrated with zero data loss\n- Latency within {{number}}% of baseline\n- Zero customer-facing incidents during migration\n- Decommission of {{migration_source}} completed by {{decommission_date}}"
+      ]
+    },
+    {
+      "id": "internal_salary_bands",
+      "doc_type": "Security Audit",
+      "title_template": "Acme Corp Compensation Framework ({{year}})",
+      "content_templates": [
+        "RESTRICTED - HR & EXECUTIVE USE ONLY\n\nAcme Corp Compensation Framework {{year}}\nApproved by: {{approver_name}}, Chief People Officer\nEffective: {{effective_date}}\n\nSalary bands by level:\n- IC1 (Junior): ${{ic1_min}} - ${{ic1_max}}\n- IC2 (Mid): ${{ic2_min}} - ${{ic2_max}}\n- IC3 (Senior): ${{ic3_min}} - ${{ic3_max}}\n- IC4 (Staff): ${{ic4_min}} - ${{ic4_max}}\n- IC5 (Principal): ${{ic5_min}} - ${{ic5_max}}\n- M1 (Manager): ${{m1_min}} - ${{m1_max}}\n- M2 (Director): ${{m2_min}} - ${{m2_max}}\n- M3 (VP): ${{m3_min}} - ${{m3_max}}",
+        "Equity refresh grants:\n- IC1-IC2: {{ic1_equity}} - {{ic2_equity}} RSUs annually\n- IC3-IC4: {{ic3_equity}} - {{ic4_equity}} RSUs annually\n- IC5+: {{ic5_equity}}+ RSUs annually (discretionary, board approved)\n\nBonus targets:\n- IC1-IC3: {{ic_bonus_pct}}% of base salary\n- IC4-IC5: {{senior_bonus_pct}}% of base salary\n- M1-M2: {{mgr_bonus_pct}}% of base salary\n- M3+: {{vp_bonus_pct}}% of base salary\n\nThis document is classified RESTRICTED. Distribution outside HR and executive leadership requires CPO approval."
+      ]
+    }
+  ]
+}
