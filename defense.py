@@ -377,18 +377,21 @@ def safety_reranker(retrieved_docs, defense_llm, alpha=0.6, beta=0.3, gamma=0.1)
     reranked.sort(key=lambda x: x["final_score"], reverse=True)
     return reranked
 
-def filter_doc_text(doc_text):
+def filter_doc_text(doc_text, defense_llm=0, threshold=0.5):
     analysis = analyze_doc_safety(doc_text)
+    suspicion_score = chunk_scanner(doc_text, defense_llm)
+    analysis["suspicion_score"] = suspicion_score
+    analysis["suspicious"] = analysis["suspicious"] or suspicion_score >= threshold
     if analysis["suspicious"]:
         return "[FILTERED: document removed because it appears to contain prompt injection instructions.]", analysis
     return doc_text, analysis
 
 
-def prepare_defended_docs(retrieved_docs):
+def prepare_defended_docs(retrieved_docs, defense_llm=0, threshold=0.5):
     defended_docs = []
     analyses = []
     for doc_id, doc_text, label in retrieved_docs:
-        safe_text, analysis = filter_doc_text(doc_text)
+        safe_text, analysis = filter_doc_text(doc_text, defense_llm=defense_llm, threshold=threshold)
         analyses.append((doc_id, doc_text, label, analysis))
         defended_docs.append(
             (

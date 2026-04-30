@@ -10,7 +10,7 @@ import os
 import re
 from rag import RAGEnv
 from docs import build_dataset
-from defense import analyze_doc_safety, chunk_scanner, safety_reranker, filter_doc_text, prepare_defended_docs, get_trust_score
+from defense import chunk_scanner, safety_reranker, prepare_defended_docs, get_trust_score
 import argparse
 
 rag_model_name = 'meta-llama/Llama-3.2-1B'
@@ -50,14 +50,14 @@ queries = [
 documents = build_dataset(n=12, attack_rate=0.5, seed=7, focus_queries=queries, preferred_attack_type='goal_hijacking')
 env = RAGEnv(docs=documents, llm=rag_model, embeddings=embeddings)
 for q in queries:
+    print(f"\n=== Query: {q} ===")
     old_response, old_retrieval = env.query(q)
-    print('**Response:\n' + old_response)
-    doc_contents = [r['content'] for r in old_retrieval]
-    print('Analyzing retrieved documents...')
-    for i in range(len(old_retrieval)):
-        print(f"-> doc_id={old_retrieval[i]['doc_id']} topic={old_retrieval[i]['topic']} attack={old_retrieval[i]['attack']}")
-        analysis = analyze_doc_safety(doc_contents[i])
-        retrieval_item = old_retrieval[i]
+    raw_docs_for_defense = []
+    original_by_id = {}
+
+    print('Initial retrieved documents:')
+    for i, retrieval_item in enumerate(old_retrieval):
+        doc_text = retrieval_item['content']
         source_kind = retrieval_item.get("source_kind")
         if retrieval_item.get("poisoned"):
             label = "malicious"
@@ -67,7 +67,48 @@ for q in queries:
             label = "benign"
         metadata = {
             "source_kind": source_kind,
+            "topic": retrieval_item.get("topic"),
+            "attack": retrieval_item.get("attack"),
+            "poisoned": retrieval_item.get("poisoned"),
+            "relevance_score": 1.0 - (i / max(len(old_retrieval), 1)),
         }
-        print("\t- Suspicion Score:", chunk_scanner(doc_contents[i], args.defense_llm))
+        print(f"-> doc_id={retrieval_item['doc_id']} topic={retrieval_item['topic']} attack={retrieval_item['attack']}")
+        print("\t- Suspicion Score:", chunk_scanner(doc_text, args.defense_llm))
         print("\t- Trust Score:", get_trust_score(label, metadata))
-        print("\t- New content:", filter_doc_text(doc_contents[i])[0])
+        raw_docs_for_defense.append((retrieval_item["doc_id"], doc_text, label, metadata))
+        original_by_id[retrieval_item["doc_id"]] = retrieval_item
+
+    print('\nOld response:')
+    print(old_response)
+
+    reranked_docs = safety_reranker(raw_docs_for_defense, args.defense_llm)
+    reranked_triplets = [
+        (item["doc_id"], item["text"], item["label"])
+        for item in reranked_docs
+    ]
+    analyses, defended_docs = prepare_defended_docs(reranked_triplets, defense_llm=args.defense_llm)
+
+    print('\nDefended documents after reranking and filtering:')
+    defended_retrieval = []
+    for (doc_id, _, original_label, analysis), (defended_doc_id, defended_text, _), reranked_item in zip(analyses, defended_docs, reranked_docs):
+        print(
+            f"-> doc_id={doc_id}\n"
+            f"\t- rerank_score={reranked_item['final_score']:.3f} safety={reranked_item['safety_score']:.3f} trust={reranked_item['trust_score']:.3f}\n"
+            f"\t- label={original_label} filtered={analysis['suspicious']}"
+        )
+        original = original_by_id[defended_doc_id]
+        if not analysis["suspicious"]:
+            defended_retrieval.append(
+                {
+                    "doc_id": defended_doc_id,
+                    "topic": original.get("topic"),
+                    "attack": original.get("attack"),
+                    "poisoned": original.get("poisoned"),
+                    "source_kind": original.get("source_kind"),
+                    "content": defended_text,
+                }
+            )
+
+    new_response = env.generate_from_retrieval(q, defended_retrieval, defended=True)
+    print('\nNew response:')
+    print(new_response)

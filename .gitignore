@@ -39,3 +39,4 @@ suspicion_model/tokenizer_config.json
 suspicion_model/tokenizer.json
 suspicion_model/train.json
 suspicion_model/vocab.txt
+red_team_attacker.py

@@ -107,6 +107,12 @@ TOPIC_KEYWORDS = {
 }
 
 
+PREFERRED_ATTACK_TEMPLATES = {
+    "goal_hijacking": (0, 2),
+    "exfiltration": (2, 1),
+}
+
+
 def _normalize(text):
     return " ".join(text.split())
 
@@ -141,7 +147,7 @@ def _topic_pool():
         for attack_type, templates in ATTACK_TEMPLATES.items():
             for template_id, template in enumerate(templates):
                 base_text = topic_data["benign"][template_id % len(topic_data["benign"])]
-                poisoned = f"{base_text}\n\n{template}"
+                poisoned = f"{template}\n\n{base_text}"
                 pool.append(
                     _make_doc(
                         doc_id,
@@ -214,7 +220,31 @@ def build_dataset(n=10, attack_rate=0, seed=7, focus_queries=None, preferred_att
             topic_docs = [doc for doc in poisoned_docs if doc.metadata["topic"] == topic]
         if not topic_docs:
             continue
-        choice = rng.choice(topic_docs)
+        preferred_templates = PREFERRED_ATTACK_TEMPLATES.get(preferred_attack_type, ())
+        preferred_docs = [
+            doc for doc in topic_docs
+            if doc.metadata.get("template_id") in preferred_templates
+        ]
+        if preferred_docs:
+            ranked_preferred_docs = sorted(
+                preferred_docs,
+                key=lambda doc: (
+                    preferred_templates.index(doc.metadata.get("template_id")),
+                    -float(doc.metadata.get("attack_strength", 0.0)),
+                ),
+            )
+            top_band = ranked_preferred_docs[: min(2, len(ranked_preferred_docs))]
+            choice = rng.choice(top_band)
+        else:
+            strongest_docs = sorted(
+                topic_docs,
+                key=lambda doc: (
+                    -float(doc.metadata.get("attack_strength", 0.0)),
+                    doc.metadata.get("template_id", 999),
+                ),
+            )
+            top_band = strongest_docs[: min(2, len(strongest_docs))]
+            choice = rng.choice(top_band)
         if choice.metadata["doc_id"] in used_ids:
             continue
         prioritized_poisoned.append(choice)
