@@ -47,11 +47,11 @@ Evaluated across 7 defense configurations (none, each alone, all combined, all m
 - **All Combined Scoring: ASR = 5%, FPR = 1.8%, Time taken = 58s**
 - All Combined (but no LLM defense): ASR = 0%, FPR = 1.8%, Time taken = 58s
 
-
 **Key findings:**
 - Phishing attacks are really efficient - 100% success rate without defenses
 - Safety reranking alone has 7.3% FPR, but works better when combined with other defenses.
 - Explicit instruction attacks are less effective than semantic/misinformation payloads on aligned LLMs.
+- Attack Success Rate drops from 55% to 5% while only taking 1.18x more time, showing how effective these defenses are when used together, while not compromising much in terms of response generation time.
 
 ---
 
