@@ -1,5 +1,3 @@
-"""Core RAG pipeline package."""
-
 from src.rag.embeddings import get_embedding_model
 from src.rag.vector_store import get_vector_store
 from src.rag.ingestion import load_corpus, build_index, load_existing_index
