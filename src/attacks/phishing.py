@@ -1,5 +1,3 @@
-"""Compatibility wrapper for the phishing attack."""
-
 from src.attacks.core import PhishingAttack, _PHISHING_TARGET_QUERIES
 
 _TARGET_QUERIES = _PHISHING_TARGET_QUERIES
