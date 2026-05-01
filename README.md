@@ -37,19 +37,19 @@ This project shows how malicious content hidden in enterprise documents can be r
 
 Evaluated across 7 defense configurations (none, each alone, all combined, all minus ML detector):
 
-- No defense: ASR = 55%, FPR = 0%, Time taken = 49s
+- No defense: ASR = 65%, FPR = 0%, Time taken = 49s
 - Chunk Scanning: ASR = 25%, FPR = 0%, Time taken = 51s
 - Trust Scoring: ASR = 35%, FPR = 0%, Time taken = 50s
 - Safety Reranking: ASR = 15%, FPR = 7.3%, Time taken = 53s
 - Trust Scoring: ASR = 45%, FPR = 0%, Time taken = 50s
-- **All Combined Scoring: ASR = 5%, FPR = 1.8%, Time taken = 58s**
+- **All Combined Scoring: ASR = 25%, FPR = 11.8%, Time taken = 58s**
 - All Combined (but no LLM defense): ASR = 0%, FPR = 1.8%, Time taken = 58s
 
 **Key findings:**
 - Phishing attacks are really efficient - 100% success rate without defenses
 - Safety reranking alone has 7.3% FPR, but works better when combined with other defenses.
 - Explicit instruction attacks are less effective than semantic/misinformation payloads on aligned LLMs.
-- Attack Success Rate drops from 55% without any defense, to 5% when all defenses are used together, while only taking 1.18x more time, showing how effective these defenses are, while not compromising much in terms of response generation time.
+- Attack Success Rate drops from 65% without any defense, to 25% when all defenses are used together, while only taking 1.18x more time, showing how effective these defenses are, while not compromising much in terms of response generation time.
 
 ---
 
