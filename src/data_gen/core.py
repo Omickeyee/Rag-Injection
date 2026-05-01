@@ -1,7 +1,4 @@
-"""Synthetic enterprise data generation primitives and implementations."""
-
 from __future__ import annotations
-
 import json
 import random
 import re
@@ -9,10 +6,8 @@ import uuid
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
-
 import yaml
 from faker import Faker
-
 from config.settings import settings
 
 INJECTION_METHODS = ("append", "middle", "html_comment")
@@ -34,62 +29,55 @@ _INTERNAL_DOCS_DEPARTMENTS = [
 
 
 class DataSource(ABC):
-    """Base class for enterprise data source generators."""
 
     @abstractmethod
-    def generate(self, count: int) -> list[dict[str, Any]]:
-        """Generate *count* synthetic documents with metadata."""
+    def generate(self, count):
         ...
 
     @property
     @abstractmethod
-    def source_type(self) -> str:
-        """Return the source type identifier."""
+    def source_type(self):
         ...
 
 
 class TemplateDataSource(DataSource):
-    """Shared template-loading behavior for document generators."""
-
     template_filename: str = ""
 
-    def __init__(self, seed: int = 42) -> None:
+    def __init__(self, seed = 42):
         self._seed = seed
         self._fake = Faker()
         Faker.seed(seed)
         random.seed(seed)
         self._templates = self._load_templates()
 
-    def generate(self, count: int) -> list[dict[str, Any]]:
+    def generate(self, count):
         return [self._generate_one() for _ in range(count)]
 
-    def _load_templates(self) -> dict:
+    def _load_templates(self):
         path = settings.data_seed_dir / self.template_filename
         with open(path) as f:
             return json.load(f)
 
-    def _pick_access_level(self) -> str:
+    def _pick_access_level(self):
         return random.choice(self._templates["access_levels"])
 
-    def _pick_trust_score(self) -> float:
+    def _pick_trust_score(self):
         lo, hi = self._templates["trust_score_range"]
         return round(random.uniform(lo, hi), 3)
 
     @abstractmethod
-    def _generate_one(self) -> dict[str, Any]:
+    def _generate_one(self):
         ...
 
 
 class ConfluenceGenerator(TemplateDataSource):
-    """Generates realistic Confluence wiki pages from seed templates."""
-
     template_filename = "confluence_pages.json"
 
     @property
-    def source_type(self) -> str:
+    def source_type(self):
         return "confluence"
 
-    def _fill(self, text: str, department: str, author: str) -> str:
+    def _fill(self, text, department, author):
         replacements = {
             "{{department}}": department,
             "{{author}}": author,
@@ -109,7 +97,7 @@ class ConfluenceGenerator(TemplateDataSource):
             text = text.replace(key, value)
         return re.sub(r"\{\{[^}]+\}\}", lambda _: self._fake.sentence(), text)
 
-    def _generate_one(self) -> dict[str, Any]:
+    def _generate_one(self):
         department = random.choice(self._templates["departments"])
         topic = random.choice(self._templates["topics"])
         author = self._fake.name()
@@ -117,7 +105,6 @@ class ConfluenceGenerator(TemplateDataSource):
         title = template["title_template"].replace("{{topic}}", topic).replace("{{department}}", department)
         content_template = random.choice(template["content_templates"])
         content = self._fill(content_template, department, author)
-
         return {
             "id": f"conf-{uuid.uuid4().hex[:12]}",
             "title": title,
@@ -138,15 +125,12 @@ class ConfluenceGenerator(TemplateDataSource):
 
 
 class SlackGenerator(TemplateDataSource):
-    """Generates realistic Slack messages."""
-
     template_filename = "slack_messages.json"
-
     @property
-    def source_type(self) -> str:
+    def source_type(self):
         return "slack"
 
-    def _fill(self, text: str, author: str) -> str:
+    def _fill(self, text, author):
         replacements = {
             "{{author}}": author,
             "{{user_name}}": self._fake.first_name(),
@@ -166,14 +150,13 @@ class SlackGenerator(TemplateDataSource):
             text = text.replace(key, value)
         return re.sub(r"\{\{[^}]+\}\}", lambda _: self._fake.word(), text)
 
-    def _generate_one(self) -> dict[str, Any]:
+    def _generate_one(self):
         channel = random.choice(self._templates["channels"])
         author = self._fake.name()
         department = random.choice(_SLACK_DEPARTMENTS)
         template_group = random.choice(self._templates["templates"])
         message_template = random.choice(template_group["message_templates"])
         content = self._fill(message_template, author)
-
         if random.random() < 0.3:
             reply_author = self._fake.first_name()
             reply = random.choice([
@@ -183,7 +166,6 @@ class SlackGenerator(TemplateDataSource):
                 f"  > {reply_author}: linking the ticket — JIRA-{random.randint(1000, 9999)}",
             ])
             content = f"{content}\n{reply}"
-
         return {
             "id": f"slack-{uuid.uuid4().hex[:12]}",
             "title": content.split("\n")[0][:80],
@@ -202,17 +184,14 @@ class SlackGenerator(TemplateDataSource):
             },
         }
 
-
 class EmailGenerator(TemplateDataSource):
-    """Generates realistic internal corporate emails."""
-
     template_filename = "emails.json"
 
     @property
-    def source_type(self) -> str:
+    def source_type(self):
         return "email"
 
-    def _fill(self, text: str, sender: str, recipient: str, department: str) -> str:
+    def _fill(self, text, sender, recipient, department):
         replacements = {
             "{{sender_name}}": sender,
             "{{recipient_name}}": recipient,
@@ -240,7 +219,7 @@ class EmailGenerator(TemplateDataSource):
             text = text.replace(key, value)
         return re.sub(r"\{\{[^}]+\}\}", lambda _: self._fake.sentence(), text)
 
-    def _generate_one(self) -> dict[str, Any]:
+    def _generate_one(self):
         template = random.choice(self._templates["templates"])
         sender = self._fake.name()
         recipient = self._fake.name()
@@ -251,7 +230,6 @@ class EmailGenerator(TemplateDataSource):
             template["subject_template"],
         )
         body = self._fill(random.choice(template["body_templates"]), sender, recipient, department)
-
         return {
             "id": f"email-{uuid.uuid4().hex[:12]}",
             "title": subject,
@@ -275,17 +253,14 @@ class EmailGenerator(TemplateDataSource):
             },
         }
 
-
 class InternalDocsGenerator(TemplateDataSource):
-    """Generates longer-form internal technical documents."""
-
     template_filename = "internal_docs.json"
 
     @property
-    def source_type(self) -> str:
+    def source_type(self):
         return "internal_docs"
 
-    def _fill(self, text: str, author: str, department: str) -> str:
+    def _fill(self, text, author, department):
         replacements = {
             "{{owner_name}}": author,
             "{{author}}": author,
@@ -314,7 +289,7 @@ class InternalDocsGenerator(TemplateDataSource):
             text = text.replace(key, value)
         return re.sub(r"\{\{[^}]+\}\}", lambda _: self._fake.sentence(), text)
 
-    def _generate_one(self) -> dict[str, Any]:
+    def _generate_one(self):
         template = random.choice(self._templates["templates"])
         author = self._fake.name()
         department = random.choice(_INTERNAL_DOCS_DEPARTMENTS)
@@ -325,7 +300,6 @@ class InternalDocsGenerator(TemplateDataSource):
             template["title_template"],
         )
         content = self._fill(random.choice(template["content_templates"]), author, department)
-
         return {
             "id": f"doc-{uuid.uuid4().hex[:12]}",
             "title": title,
@@ -345,29 +319,17 @@ class InternalDocsGenerator(TemplateDataSource):
             },
         }
 
-
 class PayloadInjector:
-    """Loads attack definitions from YAML and injects payloads into documents."""
-
-    def __init__(
-        self,
-        attacks_dir: Path | None = None,
-        num_poisoned_per_type: int | None = None,
-        seed: int = 42,
-    ) -> None:
+    def __init__(self, attacks_dir = None, num_poisoned_per_type = None, seed = 42):
         self._attacks_dir = attacks_dir or settings.data_attacks_dir
         self._num_per_type = num_poisoned_per_type or settings.num_poisoned_per_type
         self._seed = seed
         random.seed(seed)
         self._attack_defs = self._load_attack_definitions()
 
-    def inject(
-        self,
-        docs: list[dict[str, Any]],
-    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-        manifest: list[dict[str, Any]] = []
+    def inject(self, docs):
+        manifest = []
         modified = list(docs)
-
         for attack_def in self._attack_defs:
             attack_type = attack_def["attack_type"]
             variants = attack_def["variants"]
@@ -382,15 +344,12 @@ class PayloadInjector:
                 if doc["source_type"] in target_sources
                 and not any(entry["doc_id"] == doc["id"] for entry in manifest)
             ]
-
             if not eligible_indices:
                 continue
-
             chosen_indices = random.sample(
                 eligible_indices,
                 min(self._num_per_type, len(eligible_indices)),
             )
-
             for index in chosen_indices:
                 doc = dict(modified[index])
                 variant = random.choice(variants)
@@ -407,15 +366,14 @@ class PayloadInjector:
                     "original_source_type": doc["source_type"],
                     "success_patterns": variant.get("success_patterns", []),
                 })
-
         return modified, manifest
 
     @property
-    def attack_types(self) -> list[str]:
+    def attack_types(self):
         return [attack_def["attack_type"] for attack_def in self._attack_defs]
 
-    def _load_attack_definitions(self) -> list[dict]:
-        attack_defs: list[dict] = []
+    def _load_attack_definitions(self):
+        attack_defs = []
         for yaml_file in sorted(Path(self._attacks_dir).glob("*.yaml")):
             with open(yaml_file) as f:
                 data = yaml.safe_load(f)
@@ -424,9 +382,8 @@ class PayloadInjector:
         return attack_defs
 
     @staticmethod
-    def _inject_payload(content: str, payload: str, method: str) -> str:
+    def _inject_payload(content, payload, method):
         payload = payload.strip()
-
         if method == "append":
             return f"{content}\n\n{payload}"
         if method == "html_comment":
@@ -435,9 +392,7 @@ class PayloadInjector:
             lines = content.split("\n")
             lines.insert(len(lines) // 2, f"\n{payload}\n")
             return "\n".join(lines)
-
         return f"{content}\n\n{payload}"
-
 
 __all__ = [
     "ConfluenceGenerator",
