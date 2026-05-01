@@ -54,13 +54,13 @@ def main():
         help=(
             "Directory to save evaluation results and charts. "
             "Defaults to data/generated/evaluation/"
-        ),
+        )
     )
     parser.add_argument("--configs", type=str, default=None,
         help=(
             "Comma-separated list of config names to evaluate. "
             "Defaults to all 7 configs."
-        ),
+        )
     )
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging.",)
     args = parser.parse_args()
