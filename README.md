@@ -42,7 +42,7 @@ Evaluated across 7 defense configurations (none, each alone, all combined, all m
 - Trust Scoring: ASR = 35%, FPR = 0%, Time taken = 50s
 - Safety Reranking: ASR = 35%, FPR = 9.543%, Time taken = 53s
 - Trust Scoring: ASR = 50%, FPR = 0%, Time taken = 50s
-- **All Combined Scoring: ASR = 15%, FPR = 1.9%, Time taken = 58s**
+- **All Combined: ASR = 15%, FPR = 1.9%, Time taken = 58s**
 - All Combined (but no LLM defense): ASR = 10%, FPR = 1.9%, Time taken = 58s
 
 **Key findings:**
