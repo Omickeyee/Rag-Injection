@@ -35,7 +35,7 @@ This project shows how malicious content hidden in enterprise documents can be r
 
 ## Results
 
-Evaluated across 7 defense configurations (none, each alone, all combined, all minus ML detector):
+Evaluated across 7 defense configurations (none, each alone, all combined, all minus LLM defense):
 
 - No defense: ASR = 65%, FPR = 0%, Time taken = 49s
 - Chunk Scanning: ASR = 40%, FPR = 0%, Time taken = 51s
@@ -74,7 +74,7 @@ Evaluated across 7 defense configurations (none, each alone, all combined, all m
 **Installing dependencies:**
 ```bash
 git clone https://github.com/Omickeyee/Rag-Injection.git
-cd RAG--Injection
+cd RAG-Injection
 pip install -r requirements.txt
 ```
 
@@ -83,13 +83,12 @@ pip install -r requirements.txt
 ## Running the code
 
 ```bash
-python scripts/generate_data.py # Generate synthetic corpus (500 docs, 20 poisoned)
-python scripts/ingest.py # Embed and store in ChromaDB 
-python scripts/run_attacks.py --no-defenses # Run attacks without defenses
-python scripts/run_attacks.py --all-defenses # Run attacks using all defenses
-python scripts/train_detector.py # Train the LLM defense
-python scripts/simulate_evaluation.py # Fast evaluation (without Ollama)
-python scripts/evaluate.py # Full evaluation (using Ollama)
+python prepare_data.py # Generate synthetic corpus (500 docs, 20 poisoned), embed them and store them in ChromaDB
+python run_attacks.py --no-defenses # Run attacks without defenses
+python run_attacks.py --all-defenses # Run attacks using all defenses
+python train_LLM_defense.py # Train the LLM defense
+python quick_evaluation.py # Quick evaluation (without Ollama)
+python evaluate.py # Full evaluation (using Ollama)
 ```
 
 
