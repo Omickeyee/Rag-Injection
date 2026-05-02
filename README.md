@@ -2,7 +2,7 @@
 
 A compact research repository for **indirect prompt injection** threats in enterprise RAG systems.
 
-AI-based RAG systems are quite popular in the industry, with various organizations using it and giving it access to their internal data, like Slack messages, Confluence pages, emails, wiki docs etc. This exposes a very critical vulnerability - indirect prompt injection. An attacker with write access can add malicious instructions inside shared documents. When the RAG system retrieves those poisoned documents, the internal LLM reads them and also mistakes the malicious content in the poisoned documents for instructions and follows them — leaking private information, generating wrong content, or generating phishing content.
+AI-based RAG systems are quite popular in the industry, with various organizations using them and giving them access to their internal data, like Slack messages, Confluence pages, emails, wiki docs etc. This exposes a very critical vulnerability - indirect prompt injection, which means an attacker with write access can add malicious instructions inside shared documents. When the RAG system retrieves those poisoned documents, the internal LLM reads them and also mistakes the malicious content in the poisoned documents for instructions and follows them — leaking private information, generating wrong content, or generating phishing content.
 
 This project shows how malicious content hidden in enterprise documents can be retrieved and acted on by a vulnerable RAG pipeline, and how layered defenses reduce that risk.
 
